@@ -166,6 +166,12 @@ const SetupPage: React.FC = () => {
         }
     }, [location.state, navigate, childrenMap]);
 
+    useEffect(() => {
+        if (location.pathname === '/exam') {
+            setMode('timed');
+        }
+    }, [location.pathname]);
+
     const handleTopicChange = useCallback((topic: CourseTopic, checked: boolean) => {
         if (isSimuladoMode) return; // Safeguard
         setSettings(prev => {

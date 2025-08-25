@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import SetupPage from './pages/HomePage'; // Renamed component, file name is the same
 import QuizEnginePage from './pages/QuizPage'; // Renamed component
 import ResultsPage from './pages/FinalExamPage'; // Renamed component
+import SessionPage from './pages/SessionPage';
 
 const App: React.FC = () => {
   return (
@@ -12,6 +13,9 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<SetupPage />} />
+          <Route path="/session/:sessionId" element={<SessionPage />} />
+          <Route path="/question-generator" element={<SetupPage />} />
+          <Route path="/exam" element={<SetupPage />} />
           <Route path="/quiz" element={<QuizEnginePage />} />
           <Route path="/results" element={<ResultsPage />} />
         </Routes>

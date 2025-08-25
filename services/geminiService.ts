@@ -195,7 +195,7 @@ Questions MUST reflect a professional, analytical tone, mirroring official FSA L
         `;
 
         const response: GenerateContentResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-preview-04-17', contents: prompt,
+            model: 'gemini-2.5-flash', contents: prompt,
             config: { responseMimeType: 'application/json', temperature: 0.8, topK: 40 }
         });
 
