@@ -38,21 +38,27 @@ export const generateQuestions = async (settings: QuizSettings): Promise<Questio
     let topicsForQuiz: string[] = settings.topics;
     const isSimuladoMode = settings.mode === 'timed' || settings.mode === 'timed_half';
 
-    // For Simulado mode, create a diverse topic list to ensure coverage and prevent repetition.
-    if(isSimuladoMode) {
+    if (isSimuladoMode) {
         const allLeaves = getAllLeafTopics();
         
-        // Simple shuffle and slice for diversity
         const shuffledLeaves = [...allLeaves].sort(() => 0.5 - Math.random());
         topicsForQuiz = shuffledLeaves.slice(0, totalQuestions);
         
-        // If more questions are needed than available topics, start repeating them but keep them shuffled.
         if (totalQuestions > allLeaves.length) {
             let i = 0;
             while (topicsForQuiz.length < totalQuestions) {
                 topicsForQuiz.push(shuffledLeaves[i % shuffledLeaves.length]);
                 i++;
             }
+        }
+    } else {
+        // For other modes (practice, lightning), if more questions are needed than available topics, repeat the topics.
+        if (totalQuestions > topicsForQuiz.length && topicsForQuiz.length > 0) {
+            const repeatedTopics: string[] = [];
+            for (let i = 0; i < totalQuestions; i++) {
+                repeatedTopics.push(topicsForQuiz[i % topicsForQuiz.length]);
+            }
+            topicsForQuiz = repeatedTopics;
         }
     }
 
@@ -94,7 +100,7 @@ The exam uses a variety of question types to assess different cognitive skills. 
     *   Example: "Corporate disclosures of sustainability information serve which two of the following purposes in capital markets? (Choose two)"
 
 3.  **Sequencing / Ordering (8%):**
-    *   Description: A numbered list of 4-6 phrases (e.g., process steps, historical events). The candidate must select the option with the correct chronological or logical order.
+    *   Description: A numbered list of 4-6 phrases (e.g., process steps, historical events). The candidate must select the option with the correct chronological or logical order. The list of items to be ordered MUST be formatted vertically, with each item on a new line (using \\n for line breaks).
     *   Cognitive Skill: Analysis/Organization.
     *   Example: "The chart below presents examples of business initiatives... Select the arrangement of initiatives that progress from early-stage to late-stage." The options are permutations like "A. 3, 1, 2, 4".
 
@@ -183,13 +189,13 @@ Questions MUST reflect a professional, analytical tone, mirroring official FSA L
             Ensure that any double quotes inside string values are properly escaped (e.g., "a question with a \\"quote\\" in it").
             Each object in the array must have the following structure:
             {
-              "question": "The question text. For multiple-choice, explicitly add '(Choose two)' or '(Choose three)' at the end of the question string.",
+              "question": "The question text. For multiple-choice, explicitly add '(Choose two)' or '(Choose three)' at the end of the question string. For sequencing questions, use \\n for line breaks between items.",
               "options": ["An array of strings for the options. Exactly 4 for single-choice and 'choose two' questions. Exactly 6 for 'choose three' questions in simulado mode. 4-6 for practice mode based on its rules."],
               "correctAnswer": "For single-choice questions, a string. For multiple-choice questions, an array of strings with the correct answers.",
               "isMultipleChoice": true or false,
               "difficulty": "The assigned difficulty ('Fácil', 'Médio', or 'Difícil').",
               "topic": "The specific curriculum topic string from the provided list that this question relates to. This is mandatory and must be one of the leaf-node topics from the input list.",
-              "explanation": "A detailed explanation of why the correct answer(s) are correct, and a brief explanation for why each of the other options is incorrect. This must be thorough and educational."
+              "explanation": "A detailed explanation of why the correct answer(s) are correct, and a brief explanation for why each of the other options is incorrect. This must be thorough and educational. At the very end, you MUST add a citation based on the FSA Level 1 study material, for example: 'Source: 1. Demand for Sustainability Information, page 15'. If a specific page is not applicable, you may omit it."
             }
             CRITICAL: Generate a JSON array with exactly ${batchSettings.numberOfQuestions} new, unique questions. The entire response must ONLY be the JSON array. The structure must be perfect and strictly follow the rules for each mode.
         `;

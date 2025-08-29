@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto">

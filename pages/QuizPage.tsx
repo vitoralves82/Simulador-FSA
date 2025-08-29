@@ -73,6 +73,7 @@ const QuizEnginePage: React.FC = () => {
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [questionStartTime, setQuestionStartTime] = useState(Date.now());
     const [isNavOpen, setIsNavOpen] = useState(false);
+    const [timeOnCurrentQuestion, setTimeOnCurrentQuestion] = useState(0);
 
     const isTimedMode = settings?.mode === 'timed' || settings?.mode === 'timed_half';
 
@@ -101,11 +102,21 @@ const QuizEnginePage: React.FC = () => {
             return () => clearInterval(timerId);
         }
     }, [settings?.mode, showFeedback, currentQuestionIndex]);
+    
+    useEffect(() => {
+        if (settings?.mode === 'practice' && !showFeedback) {
+            const timerId = setInterval(() => {
+                setTimeOnCurrentQuestion(Math.floor((Date.now() - questionStartTime) / 1000));
+            }, 1000);
+            return () => clearInterval(timerId);
+        }
+    }, [settings?.mode, showFeedback, questionStartTime]);
 
     useEffect(() => {
         setQuestionStartTime(Date.now());
         setSelectedAnswers([]);
         setShowFeedback(false);
+        setTimeOnCurrentQuestion(0);
     }, [currentQuestionIndex]);
 
 
@@ -192,7 +203,7 @@ const QuizEnginePage: React.FC = () => {
                                 <h1 className="text-xl font-bold text-red-600 capitalize">{modeTitle}</h1>
                                 <div className="flex items-center space-x-4">
                                     {settings.mode === 'practice' ? (
-                                        <div className="text-xl font-bold text-slate-600"><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeElapsed)}</div>
+                                        <div className={`text-xl font-bold transition-colors duration-300 ${timeOnCurrentQuestion > 55 ? 'text-red-500' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeOnCurrentQuestion)}</div>
                                     ) : (
                                         <div className={`text-xl font-bold ${timeLeft !== null && timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeLeft)}</div>
                                     )}
@@ -205,7 +216,7 @@ const QuizEnginePage: React.FC = () => {
                         </div>
 
                         <div className="bg-slate-50 p-6 rounded-lg">
-                            <h2 className="text-xl font-semibold mb-4 text-slate-800">{currentQuestionIndex + 1}. {question.question}</h2>
+                            <h2 className="text-xl font-semibold mb-4 text-slate-800" style={{ whiteSpace: 'pre-wrap' }}>{currentQuestionIndex + 1}. {question.question}</h2>
                             {question.isMultipleChoice && <p className="text-sm text-gray-500 mb-4 italic">Select all applicable options.</p>}
                             
                             <div className="space-y-3">
@@ -238,7 +249,7 @@ const QuizEnginePage: React.FC = () => {
                         {showFeedback && question.explanation && (
                             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fade-in">
                                 <h4 className="font-bold text-blue-800">Explanation:</h4>
-                                <p className="text-blue-700">{question.explanation}</p>
+                                <p className="text-blue-700" style={{ whiteSpace: 'pre-wrap' }}>{question.explanation}</p>
                             </div>
                         )}
 

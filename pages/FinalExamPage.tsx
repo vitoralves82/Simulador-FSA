@@ -28,7 +28,7 @@ const ResultItem: React.FC<{ result: QuizResult, index: number }> = ({ result, i
             </div>
             {isOpen && (
                 <div className="p-4 bg-white border-t border-slate-200">
-                    <p className="font-semibold mb-3 text-slate-800">{question.question}</p>
+                    <p className="font-semibold mb-3 text-slate-800" style={{ whiteSpace: 'pre-wrap' }}>{question.question}</p>
                     <p className="text-xs text-slate-400 mb-3">TOPIC: {question.topic}</p>
                     <div className="space-y-2 text-sm">
                         {question.options.map((option, i) => {
@@ -59,7 +59,7 @@ const ResultItem: React.FC<{ result: QuizResult, index: number }> = ({ result, i
                      {question.explanation && (
                         <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                             <h4 className="font-bold text-slate-700">Explanation:</h4>
-                            <p className="text-slate-600">{question.explanation}</p>
+                            <p className="text-slate-600" style={{ whiteSpace: 'pre-wrap' }}>{question.explanation}</p>
                         </div>
                     )}
                 </div>
@@ -100,7 +100,45 @@ const ResultsPage: React.FC = () => {
             return acc;
         }, { single: { correct: 0, total: 0 }, multiple: { correct: 0, total: 0 } });
 
-        return { topicStats, weakTopics, questionTypeStats };
+        const topicTypeStats: { [topic: string]: { single: { correct: number, total: number }, multiple: { correct: number, total: number }}} = {};
+        results.forEach(result => {
+            const topic = result.question.topic || "Uncategorized";
+            const type = result.question.isMultipleChoice ? 'multiple' : 'single';
+            if (!topicTypeStats[topic]) {
+                topicTypeStats[topic] = {
+                    single: { correct: 0, total: 0 },
+                    multiple: { correct: 0, total: 0 }
+                };
+            }
+            topicTypeStats[topic][type].total++;
+            if (result.isCorrect) {
+                topicTypeStats[topic][type].correct++;
+            }
+        });
+
+        const weakAreas = Object.entries(topicTypeStats).flatMap(([topic, stats]) => {
+            const areas = [];
+            if (stats.single.total > 0 && stats.single.correct < stats.single.total) {
+                areas.push({
+                    topic,
+                    type: 'Single-Choice',
+                    accuracy: stats.single.correct / stats.single.total,
+                    ...stats.single
+                });
+            }
+            if (stats.multiple.total > 0 && stats.multiple.correct < stats.multiple.total) {
+                areas.push({
+                    topic,
+                    type: 'Multiple-Choice',
+                    accuracy: stats.multiple.correct / stats.multiple.total,
+                    ...stats.multiple
+                });
+            }
+            return areas;
+        }).sort((a, b) => a.accuracy - b.accuracy);
+
+
+        return { topicStats, weakTopics, questionTypeStats, weakAreas: weakAreas.slice(0, 3) };
     }, [results]);
 
 
@@ -159,6 +197,25 @@ const ResultsPage: React.FC = () => {
                         </Button>
                     )}
                 </div>
+            </Card>
+
+            <Card className="mt-8">
+                <h3 className="text-2xl font-bold mb-4 text-slate-800">Study Recommendations</h3>
+                {performanceData.weakAreas && performanceData.weakAreas.length > 0 ? (
+                    <div className="space-y-4">
+                    <p className="text-slate-600">Based on your performance, you should focus on these areas:</p>
+                    <ul className="list-disc list-inside space-y-3 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        {performanceData.weakAreas.map((area, index) => (
+                        <li key={index} className="text-slate-700">
+                            <span className="font-semibold">{area.type}</span> questions related to the topic <span className="font-semibold">"{area.topic.split('. ').slice(1).join('. ')}"</span>.
+                            <span className="text-sm text-slate-500 ml-2">({area.correct} of {area.total} correct)</span>
+                        </li>
+                        ))}
+                    </ul>
+                    </div>
+                ) : (
+                    <p className="text-slate-600">Great job! No specific weak areas were identified. Keep up the broad-based practice.</p>
+                )}
             </Card>
             
             <Card className="mt-8">
