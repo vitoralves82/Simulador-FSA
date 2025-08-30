@@ -256,6 +256,13 @@ const SetupPage: React.FC = () => {
       }
 
       const questions = await generateQuestions(fullSettings);
+      
+      if (questions.length === 0) {
+        setError("The AI failed to generate any questions for the selected topics. This can happen if the source material is insufficient. Please try again with different topics.");
+        setLoading(false);
+        return;
+      }
+      
       startQuiz(fullSettings, questions);
       navigate('/quiz');
     } catch (err: any) {
