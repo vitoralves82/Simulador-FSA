@@ -1,158 +1,104 @@
 // services/geminiService.ts
-// Serviço completo para RAG com Gemini + seu retriever (Cloudflare Worker).
-// Inclui o export "generateQuestions" que as páginas HomePage/QuestionGeneratorPage esperam.
-
-// @google/genai SDK for Gemini API calls
-import { GoogleGenAI } from "@google/genai";
+// Serviço para geração de questões com Gemini.
+import { GoogleGenAI, Type } from "@google/genai";
 import { Question, QuizResult } from "../types";
 
 // ---------- Tipos ----------
-type Snippet = {
-  id?: number;
-  docId: string;
-  chapter?: string | null;
-  page?: number | null;
-  snippet: string;
-  score?: number;
-};
+export type Difficulty = "easy" | "medium" | "hard";
 
-type SearchChunksResponse = {
-  snippets: Snippet[];
-  used: { topic: string; chapter?: string | null; k: number; engine: string };
-};
-
-type Difficulty = "easy" | "medium" | "hard";
-
-type GenerateInput = {
-  topic: string;
-  chapter?: string | null;
-  k?: number; // top-k de contexto (default = 5)
-  difficulty?: Difficulty;
-  alignWithExam?: boolean;
-};
-
-type GeneratedQuestion = {
+export type GeneratedQuestion = {
   question: string;
   options: string[];
   answer_keys: string[]; // e.g. ["A"], ["B", "D"]
   isMultipleChoice: boolean;
   explanation: string;
-  sources: Array<{
-    docId: string;
-    chapter?: string | null;
-    page?: number | null;
-  }>;
+};
+
+const questionSchema = {
+    type: Type.OBJECT,
+    properties: {
+        question: { type: Type.STRING, description: "The question text." },
+        options: {
+            type: Type.ARRAY,
+            description: "An array of possible answers, including labels like 'A) '.",
+            items: { type: Type.STRING }
+        },
+        answer_keys: {
+            type: Type.ARRAY,
+            description: "An array of correct answer keys, like ['A', 'C'].",
+            items: { type: Type.STRING }
+        },
+        isMultipleChoice: { type: Type.BOOLEAN, description: "True if more than one answer can be selected." },
+        explanation: { type: Type.STRING, description: "A detailed explanation of the correct and incorrect answers." }
+    },
+    required: ['question', 'options', 'answer_keys', 'isMultipleChoice', 'explanation']
 };
 
 
-// ---------- Variáveis de ambiente ----------
-const RETRIEVER_URL =
-  (import.meta as any).env?.VITE_RETRIEVER_URL ?? (window as any).__RETRIEVER_URL;
-const RETRIEVER_TOKEN =
-  (import.meta as any).env?.VITE_RETRIEVER_TOKEN ?? (window as any).__RETRIEVER_TOKEN;
-const GEMINI_API_KEY =
-  (import.meta as any).env?.VITE_GEMINI_API_KEY ?? (window as any).__GEMINI_API_KEY;
-
 // ---------- Helper: Robust JSON Parser ----------
 function robustJsonParse(jsonString: string): any {
-    // Step 1: Remove citation markers like [cite_start:1]
+    // The Gemini API with a JSON schema should return a clean JSON string.
+    // However, in case of variations (e.g., wrapped in markdown, extra text), this function adds resilience.
+    
+    // Step 1: Remove citations and trim whitespace.
     let text = jsonString.replace(/\[\s*cite_start:[^\]]*\]|\[\s*cite_end:[^\]]*\]/g, '').trim();
 
-    // Step 2: Remove markdown code fences if they exist
-    const markdownMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    // Step 2: If wrapped in markdown ```json ... ```, extract the content.
+    const markdownMatch = text.match(/```(?:json)?\s*([\s\S]+?)\s*```/);
     if (markdownMatch) {
-        text = markdownMatch[1];
+        text = markdownMatch[1].trim();
     }
 
-    // Step 3: Try parsing the cleaned text directly
-    try {
-        return JSON.parse(text);
-    } catch (e) {
-        // Step 4: If direct parsing fails, find the first '{' and the last '}'
-        const firstBrace = text.indexOf('{');
-        const lastBrace = text.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace > firstBrace) {
-            const potentialJson = text.substring(firstBrace, lastBrace + 1);
-            try {
-                return JSON.parse(potentialJson);
-            } catch (finalError) {
-                const errorMessage = `Failed to parse JSON even after extraction. The AI's response was malformed. Snippet: "${jsonString.substring(0, 100)}..."`;
-                throw new Error(errorMessage);
-            }
-        }
+    // Step 3: The model might add text before/after the JSON object.
+    // Find the first '{' and the last '}' to extract the core object.
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+        text = text.substring(firstBrace, lastBrace + 1);
     }
     
-    const errorMessage = `Could not find a valid JSON object in the AI's response. Snippet: "${jsonString.substring(0, 100)}..."`;
-    throw new Error(errorMessage);
+    // Step 4: Try to parse the cleaned/extracted string.
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        // If all cleanup attempts fail, throw a detailed error.
+        console.error("Final JSON parsing attempt failed for text:", text, "Original string:", jsonString);
+        const errorMessage = `Could not find a valid JSON object in the AI's response. Snippet: "${jsonString.substring(0, 100)}..."`;
+        throw new Error(errorMessage);
+    }
 }
 
 
-// ---------- 1) Retriever: chama o Worker e obtém snippets ----------
-export async function searchChunks(params: {
-  topic: string;
-  chapter?: string | null;
-  k?: number;
-}): Promise<SearchChunksResponse> {
-  if (!RETRIEVER_URL || !RETRIEVER_TOKEN) {
-    throw new Error("Retriever URL/token não configurados (VITE_RETRIEVER_URL / VITE_RETRIEVER_TOKEN).");
-  }
-
-  const body = JSON.stringify({
-    topic: params.topic,
-    chapter: params.chapter ?? null,
-    k: Math.min(Math.max(params.k ?? 5, 1), 10),
-  });
-
-  const res = await fetch(RETRIEVER_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${RETRIEVER_TOKEN}`,
-    },
-    body,
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`Retriever HTTP ${res.status}: ${txt}`);
-  }
-
-  const json = (await res.json()) as SearchChunksResponse;
-  if (!json || !Array.isArray(json.snippets)) {
-    throw new Error("Formato inesperado do retriever.");
-  }
-  return json;
-}
-
-// ---------- 2) Prompt rígido (apenas contexto) ----------
-function buildPromptFromSnippets(opts: {
+// ---------- Prompt Builder ----------
+function buildPrompt(opts: {
   topic: string;
   difficulty?: Difficulty;
-  snippets: Snippet[];
   alignWithExam?: boolean;
+  exampleQuestions?: Question[];
 }): string {
-  const { topic, difficulty = "medium", snippets, alignWithExam } = opts;
+  const { topic, difficulty = "medium", alignWithExam, exampleQuestions } = opts;
 
-  const context = snippets
-    .map((s, i) => {
-      const attrs = [
-        s.docId ? `docId="${s.docId}"` : "",
-        s.chapter ? `chapter="${s.chapter}"` : "",
-        typeof s.page === "number" ? `page="${s.page}"` : "",
-      ]
-        .filter(Boolean)
-        .join(" ");
-      const text = (s.snippet || "").slice(0, 1200);
-      return `<CHUNK idx="${i + 1}" ${attrs}>
-${text}
-</CHUNK>`;
-    })
-    .join("\n\n");
+  const examplePrompt = (exampleQuestions && exampleQuestions.length > 0)
+    ? `
+Use the following questions as inspiration for style, format, and subject matter.
+Your task is to generate a COMPLETELY NEW and UNIQUE question on the same topic.
+DO NOT copy or slightly rephrase the example questions.
 
-    if (alignWithExam) {
-        return `
+--- EXAMPLE QUESTIONS START ---
+${exampleQuestions.map(q => JSON.stringify({ question: q.question, options: q.options })).join('\n---\n')}
+--- EXAMPLE QUESTIONS END ---
+`
+    : '';
+
+  if (alignWithExam) {
+      return `
 You are an expert exam item writer for the IFRS Foundation's FSA Level I exam.
-Your task is to create ONE exam-style question based ONLY on the provided <CONTEXT>.
+Your task is to create ONE exam-style question based on your knowledge of the topic: "${topic}".
+
+${examplePrompt}
+
+Output English only.
 
 **FSA Level I Question Styles:**
 You MUST generate a question that fits one of the following formats, chosen based on what the context best supports:
@@ -164,74 +110,47 @@ You MUST generate a question that fits one of the following formats, chosen base
 6.  **Inclusion/Exclusion Criteria:** Ask which two statements, if true, provide evidence that a topic fails to meet criteria for inclusion in a standard. This is typically a "Choose two" format.
 
 **Constraints:**
-- Use ONLY facts/statements explicitly found in the <CONTEXT>.
 - The question must be about "${topic}" with difficulty: ${difficulty}.
 - Adhere strictly to one of the question styles described above.
-- The explanation must follow the official style: First, explain *why* each correct option is correct. Then, for each incorrect option, explain *why* it is incorrect. All explanations must be grounded in the <CONTEXT>.
-- If the context is insufficient for a high-quality question, answer exactly: "Insufficient data in context".
-
-**Required JSON output schema (no prose, no markdown, no code fences):**
-{
-  "question": "string",
-  "options": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
-  "answer_keys": ["B", "E"],
-  "isMultipleChoice": boolean,
-  "explanation": "string",
-  "sources": [{"docId":"string","chapter":"string|null","page":123|null}]
-}
-
-<CONTEXT>
-${context}
-</CONTEXT>
+- The explanation must follow the official style: First, explain *why* each correct option is correct. Then, for each incorrect option, explain *why* it is incorrect.
+- The output must be a single JSON object. Do not add any extra text, prose, or markdown formatting around the JSON.
 `;
-    }
+  }
 
   return `
 You are an exam question writer for the **FSA Credential Level 1** (sustainability/ESG).
-Work ONLY with the provided <CONTEXT>. Do NOT use prior knowledge.
-If the context is insufficient to support a safe and specific question, answer exactly: "Insufficient data in context".
+Use your knowledge to generate a question.
+
+${examplePrompt}
 
 Output English only.
 
 Constraints:
 - Create ONE multiple-choice question about "${topic}" (difficulty: ${difficulty}).
-- Use ONLY facts/statements explicitly found in <CONTEXT>.
 - Write 4 options (A–D). Exactly ONE must be correct.
-- Provide a short explanation (1–3 sentences) grounded ONLY in the context.
-- Provide sources as a list of up to 3 items, each with {docId, chapter, page} that appear in the <CONTEXT>.
-- If you are not fully sure, return "Insufficient data in context".
-
-Required JSON output schema (no prose, no markdown, no code fences):
-{
-  "question": "string",
-  "options": ["A) ...","B) ...","C) ...","D) ..."],
-  "answer_keys": ["A"],
-  "isMultipleChoice": false,
-  "explanation": "string",
-  "sources": [{"docId":"string","chapter":"string|null","page":123|null}]
-}
-
-<CONTEXT>
-${context}
-</CONTEXT>
+- Provide a short explanation (1–3 sentences).
+- The output must be a single JSON object. Do not add any extra text, prose, or markdown formatting around the JSON.
 `;
 }
 
-// ---------- 3) Chamada ao Gemini ----------
+// ---------- Gemini API Call ----------
 async function callGemini(prompt: string, outputJson: boolean = true): Promise<string> {
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY não configurada.");
-
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  // API Key is expected to be in process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const config: any = {
       temperature: 0.4,
       topK: 32,
       topP: 0.95,
-      maxOutputTokens: 1024,
+      maxOutputTokens: 2048,
+      // As per guidelines, setting thinkingBudget when maxOutputTokens is set for gemini-2.5-flash
+      // reserves tokens for the final output, preventing truncation.
+      thinkingConfig: { thinkingBudget: 1024 },
   };
   
   if (outputJson) {
       config.responseMimeType = "application/json";
+      config.responseSchema = questionSchema;
   }
 
   const response = await ai.models.generateContent({
@@ -242,38 +161,17 @@ async function callGemini(prompt: string, outputJson: boolean = true): Promise<s
 
   const text = response.text;
 
-  if (!text) throw new Error("Resposta vazia do modelo.");
+  if (!text) throw new Error("Empty response from model.");
   return text;
 }
 
-// ---------- 4) Validação das fontes ----------
-function norm(v: unknown): string {
-  return String(v ?? "").trim().replace(/\s+/g, " ").toLowerCase();
-}
-
-function validateSources(
-  snippets: Snippet[],
+// ---------- Question Validation ----------
+function validateGeneratedQuestion(
   out: GeneratedQuestion
 ): { ok: boolean; reason?: string } {
-  if (!out?.sources?.length) return { ok: false, reason: "No sources in output." };
-
-  const allowed = new Set(
-    snippets.map((s) =>
-      [norm(s.docId), norm(s.chapter ?? ""), typeof s.page === "number" ? String(s.page) : ""].join("|")
-    )
-  );
-
-  for (const src of out.sources) {
-    const key = [norm(src.docId), norm(src.chapter ?? ""), typeof src.page === "number" ? String(src.page) : ""].join("|");
-    const alt = [norm(src.docId), norm(src.chapter ?? ""), ""].join("|"); // tolera page null
-    if (!allowed.has(key) && !allowed.has(alt)) {
-      return { ok: false, reason: `Source not in context: ${JSON.stringify(src)}` };
-    }
-  }
-
+  if (!out.question || typeof out.question !== 'string') return {ok: false, reason: "Missing or invalid 'question' field."};
   if (!Array.isArray(out.answer_keys) || out.answer_keys.length === 0) return { ok: false, reason: "Answer keys must be a non-empty array." };
   if (!Array.isArray(out.options) || out.options.length < 2) return { ok: false, reason: "Must provide at least 2 options." };
-
 
   for (const key of out.answer_keys) {
       if (!/^[A-F]$/.test(key)) return { ok: false, reason: `Invalid answer key format: ${key}`};
@@ -290,136 +188,51 @@ function validateSources(
   return { ok: true };
 }
 
-// ---------- 5) Uma questão a partir do contexto ----------
-export async function generateQuestionFromContext(input: GenerateInput): Promise<{
-  ok: boolean;
-  data?: GeneratedQuestion;
-  reason?: string;
-  used?: { topic: string; chapter?: string | null; k: number };
-}> {
-  const topic = input.topic?.trim();
-  if (!topic) return { ok: false, reason: "Missing topic." };
 
-  const { snippets, used } = await searchChunks({
-    topic,
-    chapter: input.chapter ?? null,
-    k: input.k ?? 5,
-  });
-
-  if (!snippets.length) return { ok: false, reason: "No snippets found for topic.", used };
-
-  const prompt = buildPromptFromSnippets({
-    topic,
-    difficulty: input.difficulty ?? "medium",
-    snippets,
-    alignWithExam: input.alignWithExam ?? true,
-  });
-
-  const raw = await callGemini(prompt, true);
-
-  let parsed: GeneratedQuestion | null = null;
-  try {
-    parsed = robustJsonParse(raw) as GeneratedQuestion;
-  } catch (err: any) {
-    return { ok: false, reason: err.message, used };
-  }
-  
-  if (!parsed) return { ok: false, reason: "Model did not return valid JSON.", used };
-
-
-  const allText = `${parsed.question} ${parsed.explanation}`.toLowerCase();
-  if (allText.includes("insufficient data in context")) {
-    return { ok: false, reason: "Insufficient data in context.", used };
-  }
-
-  const check = validateSources(snippets, parsed);
-  if (!check.ok) return { ok: false, reason: `Invalid sources: ${check.reason}`, used };
-
-  return { ok: true, data: parsed, used };
-}
-
-// ---------- 6) Adaptador pedido pelas páginas: generateQuestions ----------
-// Aceita dois formatos:
-//   A) generateQuestions("topic", "14.2", 5, "medium")  -> 1 questão
-//   B) generateQuestions({ topic, chapter, k, difficulty, count: 3 }) -> N questões
-export async function generateQuestions(
-  arg1:
-    | string
-    | {
-        topic: string;
-        chapter?: string | null;
-        k?: number;
-        difficulty?: Difficulty;
-        count?: number; // quantas questões (default 1)
-        alignWithExam?: boolean;
-      },
-  chapter?: string | null,
-  k?: number,
-  difficulty?: Difficulty
-): Promise<{
+// ---------- Public Question Generator ----------
+export async function generateQuestions(params: {
+    topic: string;
+    difficulty?: Difficulty;
+    count?: number;
+    alignWithExam?: boolean;
+    exampleQuestions?: Question[];
+}): Promise<{
   ok: boolean;
   data?: GeneratedQuestion[];
   reason?: string;
-  used?: { topic: string; chapter?: string | null; k: number };
 }> {
-  let topic: string;
-  let chap: string | null | undefined;
-  let topk: number | undefined;
-  let diff: Difficulty | undefined;
-  let count = 1;
-  let alignWithExam = true;
-
-  if (typeof arg1 === "string") {
-    topic = arg1;
-    chap = chapter ?? null;
-    topk = k ?? 5;
-    diff = difficulty ?? "medium";
-  } else {
-    topic = arg1.topic;
-    chap = arg1.chapter ?? null;
-    topk = arg1.k ?? 5;
-    diff = arg1.difficulty ?? "medium";
-    count = Math.max(1, Math.min(10, arg1.count ?? 1)); // limite defensivo
-    alignWithExam = arg1.alignWithExam ?? true;
-  }
-
-  // Para ganhar performance, buscamos os snippets UMA vez e reutilizamos no loop.
-  const { snippets, used } = await searchChunks({ topic, chapter: chap ?? null, k: topk });
-
-  if (!snippets.length) return { ok: false, reason: "No snippets found for topic.", used };
+  const { topic, difficulty, count = 1, alignWithExam = true, exampleQuestions } = params;
 
   const results: GeneratedQuestion[] = [];
+  // Generate questions sequentially to avoid overwhelming the API and to handle errors gracefully.
   for (let i = 0; i < count; i++) {
-    const prompt = buildPromptFromSnippets({ topic, difficulty: diff, snippets, alignWithExam });
-
-    const raw = await callGemini(prompt, true);
-
-    let parsed: GeneratedQuestion | null = null;
     try {
-        parsed = robustJsonParse(raw) as GeneratedQuestion;
+        const prompt = buildPrompt({ topic, difficulty, alignWithExam, exampleQuestions });
+        const raw = await callGemini(prompt, true);
+        const parsed = robustJsonParse(raw) as GeneratedQuestion;
+        
+        if (!parsed) {
+          return { ok: false, reason: "Model did not return valid JSON." };
+        }
+
+        const check = validateGeneratedQuestion(parsed);
+        if (!check.ok) {
+          console.error("Invalid question data from AI:", parsed, "Reason:", check.reason);
+          return { ok: false, reason: `AI returned a malformed question. Please try again. (${check.reason})` };
+        }
+        results.push(parsed);
+
     } catch (err: any) {
-        return { ok: false, reason: err.message, used };
+        console.error("Error generating question:", err);
+        return { ok: false, reason: err.message || "An unknown error occurred while communicating with the AI." };
     }
-    
-    if (!parsed) return { ok: false, reason: "Model did not return valid JSON.", used };
-
-    const allText = `${parsed.question} ${parsed.explanation}`.toLowerCase();
-    if (allText.includes("insufficient data in context")) {
-      return { ok: false, reason: "Insufficient data in context.", used };
-    }
-
-    const check = validateSources(snippets, parsed);
-    if (!check.ok) {
-      return { ok: false, reason: `Invalid sources: ${check.reason}`, used };
-    }
-
-    results.push(parsed);
   }
 
-  return { ok: true, data: results, used };
+  return { ok: true, data: results };
 }
 
-// ---------- 7) Novas funções de Análise e Explicação com IA ----------
+
+// ---------- AI-powered Analysis and Explanation Functions ----------
 export async function generateExplanation(
   question: Question,
   userAnswer: string[]
@@ -524,5 +337,5 @@ Keep the tone supportive and constructive. The goal is to help the student impro
 }
 
 
-// ---------- 8) (Opcional) exportar tipos para uso externo ----------
-export type { GeneratedQuestion, Difficulty, Snippet, SearchChunksResponse };
+// FIX: Removed redundant export of 'GeneratedQuestion' which caused a conflict.
+// The type is already exported where it is defined.

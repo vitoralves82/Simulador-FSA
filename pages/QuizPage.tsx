@@ -75,7 +75,7 @@ const QuizEnginePage: React.FC = () => {
     const [isNavOpen, setIsNavOpen] = useState(false);
     const [timeOnCurrentQuestion, setTimeOnCurrentQuestion] = useState(0);
 
-    const isTimedMode = settings?.mode === 'timed' || settings?.mode === 'timed_half';
+    const isTimedMode = settings?.mode === 'timed' || settings?.mode === 'timed_half' || settings?.mode === 'assessment';
 
     useEffect(() => {
         if (!settings || questions.length === 0) return;
@@ -126,9 +126,11 @@ const QuizEnginePage: React.FC = () => {
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
         } else {
-            if (settings?.mode === 'practice' || settings?.mode === 'assessment') endQuiz(timeElapsed);
-            else if (isTimedMode) endQuiz((questions.length * 90) - (timeLeft ?? 0));
-            else endQuiz();
+            if (isTimedMode) {
+                endQuiz((questions.length * 90) - (timeLeft ?? 0));
+            } else { // Practice mode
+                endQuiz(timeElapsed);
+            }
             navigate('/results');
         }
     }, [currentQuestionIndex, questions, selectedAnswers, submitAnswer, navigate, settings, timeLeft, endQuiz, timeElapsed, isTimedMode, questionStartTime]);
@@ -197,10 +199,10 @@ const QuizEnginePage: React.FC = () => {
                             <div className="flex justify-between items-center mb-2">
                                 <h1 className="text-xl font-bold text-red-600 capitalize">{modeTitle}</h1>
                                 <div className="flex items-center space-x-4">
-                                    {(settings.mode === 'practice' || settings.mode === 'assessment') ? (
-                                        <div className={`text-xl font-bold transition-colors duration-300 ${timeOnCurrentQuestion > 55 ? 'text-red-500' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeOnCurrentQuestion)}</div>
-                                    ) : (
+                                    {isTimedMode ? (
                                         <div className={`text-xl font-bold ${timeLeft !== null && timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeLeft)}</div>
+                                    ) : (
+                                        <div className={`text-xl font-bold transition-colors duration-300 ${timeOnCurrentQuestion > 55 ? 'text-red-500' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeOnCurrentQuestion)}</div>
                                     )}
                                     <p className="text-gray-600 font-semibold">{results.length} / {questions.length}</p>
                                 </div>
@@ -258,7 +260,7 @@ const QuizEnginePage: React.FC = () => {
                                 <i className={`fa-solid fa-star mr-2 ${isReviewed ? 'text-yellow-500' : 'text-slate-400'}`}></i>
                                 {isReviewed ? 'Marked for Review' : 'Mark for Review'}
                             </button>
-                            {(settings.mode === 'practice' || settings.mode === 'assessment') ? (
+                            {settings.mode === 'practice' ? (
                                 showFeedback ? (
                                      <Button onClick={handleNext}>Next Question</Button>
                                 ) : (

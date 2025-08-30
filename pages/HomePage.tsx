@@ -87,7 +87,7 @@ const SetupPage: React.FC = () => {
   const location = useLocation();
   const { startQuiz, isLoading, setLoading, setError, error } = useQuiz();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const assessmentFileInputRef = useRef<HTMLInputElement>(null);
+  const inspirationFileInputRef = useRef<HTMLInputElement>(null);
 
 
   const [settings, setSettings] = useState<Pick<QuizSettings, 'topics' | 'difficulty' | 'numberOfQuestions'>>({
@@ -97,8 +97,9 @@ const SetupPage: React.FC = () => {
   });
   const [mode, setMode] = useState<QuizMode>('practice');
   const [alignWithExam, setAlignWithExam] = useState(true);
-  const [assessmentFiles, setAssessmentFiles] = useState<File[]>([]);
+  const [inspirationFiles, setInspirationFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
+  const [generationProgress, setGenerationProgress] = useState<number | null>(null);
   
   const [activeTopicId, setActiveTopicId] = useState<string>(curriculumTopics[0].id);
 
@@ -108,8 +109,6 @@ const SetupPage: React.FC = () => {
 
   const SIMULADO_COMPLETO_QUESTIONS = 20;
   const HALF_SIMULADO_QUESTIONS = 50;
-  const ASSESSMENT_QUESTIONS = 40;
-
 
   const allTopicTitles = useMemo(() => {
     const titles: string[] = [];
@@ -141,7 +140,7 @@ const SetupPage: React.FC = () => {
       return {
         topics: [],
         difficulty: ['Fácil', 'Médio', 'Difícil'] as Difficulty[],
-        numberOfQuestions: ASSESSMENT_QUESTIONS
+        numberOfQuestions: settings.numberOfQuestions
       };
     }
     return settings;
@@ -154,26 +153,31 @@ const SetupPage: React.FC = () => {
   );
   
   const [parentMap, childrenMap, topicToPartMap] = useMemo(() => {
-        const pMap = new Map<string, string | null>();
-        const cMap = new Map<string, string[]>();
-        const partMap = new Map<string, string>();
-        
-        const traverse = (topic: CourseTopic, parent: CourseTopic | null, partId: string) => {
-            pMap.set(topic.title, parent ? parent.title : null);
-            partMap.set(topic.title, partId);
+    const pMap = new Map<string, string | null>();
+    const cMap = new Map<string, string[]>();
+    const partMap = new Map<string, string>();
+    
+    const traverse = (topic: CourseTopic, parent: CourseTopic | null, partId: string) => {
+        pMap.set(topic.title, parent ? parent.title : null);
+        partMap.set(topic.title, partId);
 
-            const childTitles = topic.subTopics ? topic.subTopics.map(t => t.title) : [];
-            cMap.set(topic.title, childTitles);
+        const childTitles = topic.subTopics ? topic.subTopics.map(t => t.title) : [];
+        cMap.set(topic.title, childTitles);
 
-            if (topic.subTopics) {
-                topic.subTopics.forEach(sub => traverse(sub, topic, partId));
-            }
-        };
-        curriculumTopics.forEach(part => {
-          part.subTopics?.forEach(topic => traverse(topic, null, part.id))
-        });
-        return [pMap, cMap, partMap];
-    }, []);
+        if (topic.subTopics) {
+            topic.subTopics.forEach(sub => traverse(sub, topic, partId));
+        }
+    };
+    
+    curriculumTopics.forEach(part => {
+      partMap.set(part.title, part.id);
+      if (part.subTopics) {
+        part.subTopics.forEach(subTopic => traverse(subTopic, part, part.id));
+      }
+    });
+
+    return [pMap, cMap, partMap];
+  }, []);
 
     const selectedTopics = useMemo(() => new Set(effectiveSettings.topics), [effectiveSettings.topics]);
     
@@ -317,98 +321,175 @@ const SetupPage: React.FC = () => {
       }
       return transformLoadedQuizData(data, questionIdCounter);
   };
-
-  const handleStartAssessmentQuiz = async () => {
-    if (assessmentFiles.length === 0) {
-        setError("Please upload at least one question bank file for the assessment.");
-        return;
-    }
-    setLoading(true);
-    setError(null);
-    setNotification(null);
-
-    try {
-        // 1. Read and parse all files
-        const fileContents = await Promise.all(assessmentFiles.map(file => file.text()));
-        let allQuestions: Question[] = [];
-        let questionIdCounter = 0;
-        fileContents.forEach(content => {
-            const questionsFromFile = parseAndTransformQuizData(content, questionIdCounter);
-            allQuestions.push(...questionsFromFile);
-            questionIdCounter += questionsFromFile.length;
-        });
-
-        if (allQuestions.length < ASSESSMENT_QUESTIONS) {
-          throw new Error(`Not enough questions. Uploaded files contain only ${allQuestions.length} questions, but ${ASSESSMENT_QUESTIONS} are needed for a full assessment.`);
+  
+  const selectAssessmentQuestions = (allQuestions: Question[], totalCount: number): Question[] => {
+    // 1. Categorize questions by Part
+    const categorizedQuestions: { [key: string]: Question[] } = {
+        'part-i': [], 'part-ii': [], 'part-iii': [], 'part-iv': []
+    };
+    allQuestions.forEach(q => {
+        const partId = topicToPartMap.get(q.topic);
+        if (partId && categorizedQuestions[partId]) {
+            categorizedQuestions[partId].push(q);
         }
+    });
 
-        // 2. Categorize questions by Part
-        const categorizedQuestions: { [key: string]: Question[] } = {
-            'part-i': [], 'part-ii': [], 'part-iii': [], 'part-iv': []
-        };
-        allQuestions.forEach(q => {
-            const partId = topicToPartMap.get(q.topic);
-            if (partId && categorizedQuestions[partId]) {
-                categorizedQuestions[partId].push(q);
-            }
-        });
-
-        // 3. Select questions based on distribution
-        const distribution = {
-            'part-i': 0.15, // 6 questions
-            'part-ii': 0.35, // 14 questions
-            'part-iii': 0.15, // 6 questions
-            'part-iv': 0.35, // 14 questions
-        };
-        let selectedQuestions: Question[] = [];
-        Object.entries(distribution).forEach(([partId, percentage]) => {
-            const count = Math.round(ASSESSMENT_QUESTIONS * percentage);
-            const pool = categorizedQuestions[partId];
-            if (pool.length < count) {
-                console.warn(`Not enough questions for ${partId}. Have ${pool.length}, need ${count}. Using all available.`);
-                selectedQuestions.push(...pool);
-            } else {
-                 const shuffled = pool.sort(() => 0.5 - Math.random());
-                 selectedQuestions.push(...shuffled.slice(0, count));
-            }
-        });
-        
-        // Ensure exact count
-        selectedQuestions = selectedQuestions.sort(() => 0.5 - Math.random()).slice(0, ASSESSMENT_QUESTIONS);
-
-        // 4. Start quiz
-        const finalSettings: QuizSettings = {
-            ...effectiveSettings,
-            mode: 'assessment',
-            topics: ['Assessment Mix'],
-        };
-
-        startQuiz(finalSettings, selectedQuestions.map((q, i) => ({ ...q, id: i })));
-        navigate('/quiz');
-
-    } catch (err: any) {
-        setError(err.message || 'An unknown error occurred during assessment setup.');
-    } finally {
-        setLoading(false);
+    // 2. Select questions based on distribution
+    const distribution = {
+        'part-i': 0.15, 'part-ii': 0.35, 'part-iii': 0.15, 'part-iv': 0.35
+    };
+    let selectedQuestions: Question[] = [];
+    Object.entries(distribution).forEach(([partId, percentage]) => {
+        const count = Math.round(totalCount * percentage);
+        const pool = categorizedQuestions[partId] || [];
+        if (pool.length < count) {
+            console.warn(`Not enough questions for ${partId}. Have ${pool.length}, need ${count}. Using all available.`);
+            selectedQuestions.push(...pool);
+        } else {
+            const shuffled = pool.sort(() => 0.5 - Math.random());
+            selectedQuestions.push(...shuffled.slice(0, count));
+        }
+    });
+    
+    // 3. Ensure exact count by shuffling and slicing
+    if (selectedQuestions.length > totalCount) {
+        selectedQuestions = selectedQuestions.sort(() => 0.5 - Math.random()).slice(0, totalCount);
+    } else if (selectedQuestions.length < totalCount && allQuestions.length >= totalCount) {
+        const remainingNeeded = totalCount - selectedQuestions.length;
+        const selectedIds = new Set(selectedQuestions.map(q => q.id));
+        const remainingPool = allQuestions.filter(q => !selectedIds.has(q.id));
+        selectedQuestions.push(...remainingPool.sort(() => 0.5 - Math.random()).slice(0, remainingNeeded));
     }
+
+    return selectedQuestions.sort(() => 0.5 - Math.random()).slice(0, totalCount);
   };
 
-
   const handleStartQuiz = async () => {
-    if (mode === 'assessment') {
-        handleStartAssessmentQuiz();
-        return;
-    }
-
     setLoading(true);
     setError(null);
     setNotification(null);
+    setGenerationProgress(0);
+
+    let inspirationQuestions: Question[] = [];
+    if (alignWithExam && inspirationFiles.length > 0) {
+        try {
+            const fileContents = await Promise.all(inspirationFiles.map(file => file.text()));
+            let questionIdCounter = 0;
+            fileContents.forEach(content => {
+                const questionsFromFile = parseAndTransformQuizData(content, questionIdCounter);
+                inspirationQuestions.push(...questionsFromFile);
+                questionIdCounter += questionsFromFile.length;
+            });
+        } catch (err: any) {
+            setError(`Error reading inspiration files: ${err.message}`);
+            setLoading(false);
+            setGenerationProgress(null);
+            return;
+        }
+    }
+
+    // --- Assessment Mode Logic ---
+    if (mode === 'assessment') {
+        if (inspirationFiles.length === 0) {
+            setError("Please upload at least one question bank file for the assessment.");
+            setLoading(false);
+            setGenerationProgress(null);
+            return;
+        }
+
+        try {
+            // Re-read files here for simplicity, or use `inspirationQuestions` if `alignWithExam` is true
+            const fileContents = await Promise.all(inspirationFiles.map(file => file.text()));
+            let allQuestionsFromFile: Question[] = [];
+            let questionIdCounter = 0;
+            fileContents.forEach(content => {
+                const questionsFromFile = parseAndTransformQuizData(content, questionIdCounter);
+                allQuestionsFromFile.push(...questionsFromFile);
+                questionIdCounter += questionsFromFile.length;
+            });
+
+            const totalCount = effectiveSettings.numberOfQuestions;
+            
+            if (alignWithExam) {
+                // Generate NEW questions using file content as examples
+                setNotification("Using uploaded questions as inspiration to generate new ones with AI...");
+                const generatedQuestions: Question[] = [];
+                let questionId = 0;
+                
+                const topics = [...new Set(allQuestionsFromFile.map(q => q.topic))].filter(Boolean);
+                if (topics.length === 0) throw new Error("No topics found in the uploaded files to guide the AI.");
+
+                const mapDifficulty = (d: Difficulty): 'easy' | 'medium' | 'hard' => {
+                    if (d === 'Fácil') return 'easy'; if (d === 'Difícil') return 'hard'; return 'medium';
+                };
+                const geminiDifficulties = effectiveSettings.difficulty.map(mapDifficulty);
+
+                for (let i = 0; i < totalCount; i++) {
+                    const topic = topics[i % topics.length];
+                    const examples = allQuestionsFromFile.filter(q => q.topic === topic).sort(() => 0.5 - Math.random()).slice(0, 3);
+                    
+                    const result = await generateQuestions({
+                        topic,
+                        count: 1,
+                        exampleQuestions: examples,
+                        difficulty: geminiDifficulties[Math.floor(Math.random() * geminiDifficulties.length)],
+                        alignWithExam: true
+                    });
+                    
+                    if (result.ok && result.data) {
+                        const genQ = result.data[0];
+                        const correctOptionIndices = genQ.answer_keys.map(key => key.charCodeAt(0) - 65);
+                        const cleanOptions = genQ.options.map(opt => opt.replace(/^[A-Z]\)\s*/, ''));
+                        const correctAnswers = correctOptionIndices.map(index => cleanOptions[index]).filter(Boolean as any);
+
+                        if (correctAnswers.length !== genQ.answer_keys.length) continue;
+
+                        generatedQuestions.push({
+                            id: questionId++,
+                            question: genQ.question,
+                            options: cleanOptions,
+                            correctAnswer: genQ.isMultipleChoice ? correctAnswers : correctAnswers[0],
+                            isMultipleChoice: genQ.isMultipleChoice,
+                            difficulty: effectiveSettings.difficulty[Math.floor(Math.random() * effectiveSettings.difficulty.length)],
+                            explanation: genQ.explanation,
+                            topic: topic,
+                        });
+                         setGenerationProgress(Math.round(((i + 1) / totalCount) * 100));
+                    } else {
+                        throw new Error(result.reason || `AI failed to generate questions for topic: ${topic}`);
+                    }
+                }
+                
+                const finalSettings: QuizSettings = { ...effectiveSettings, mode: 'assessment', topics: ['AI-Generated Assessment'] };
+                startQuiz(finalSettings, generatedQuestions);
+                navigate('/quiz');
+            } else {
+                // Original assessment behavior: just use questions from file
+                if (allQuestionsFromFile.length < totalCount) {
+                  throw new Error(`Not enough questions. Uploaded files contain only ${allQuestionsFromFile.length} questions, but ${totalCount} are needed for a full assessment.`);
+                }
+                const selectedQuestions = selectAssessmentQuestions(allQuestionsFromFile, totalCount);
+                const finalSettings: QuizSettings = { ...effectiveSettings, mode: 'assessment', topics: ['Assessment Mix'] };
+                startQuiz(finalSettings, selectedQuestions.map((q, i) => ({ ...q, id: i })));
+                navigate('/quiz');
+            }
+        } catch (err: any) {
+            setError(err.message || 'An unknown error occurred during assessment setup.');
+        } finally {
+            setLoading(false);
+            setGenerationProgress(null);
+        }
+        return;
+    }
+
+    // --- Practice & Timed Mode Logic ---
     try {
       const finalTopics = effectiveSettings.topics.filter(t => (childrenMap.get(t) || []).length === 0);
       
        if (finalTopics.length === 0) {
             setError("Please select at least one specific sub-topic to generate questions.");
             setLoading(false);
+            setGenerationProgress(null);
             return;
         }
       
@@ -435,11 +516,16 @@ const SetupPage: React.FC = () => {
         const count = Math.min(questionsPerTopic, fullSettings.numberOfQuestions - allQuestions.length);
         if (count <= 0) break;
 
+        const examples = inspirationQuestions.length > 0
+            ? inspirationQuestions.filter(q => q.topic === topic).sort(() => 0.5 - Math.random()).slice(0, 3)
+            : [];
+
         const result = await generateQuestions({
             topic: topic,
             count: count,
             difficulty: geminiDifficulties[Math.floor(Math.random() * geminiDifficulties.length)],
             alignWithExam: alignWithExam,
+            exampleQuestions: examples
         });
 
         if (result.ok && result.data) {
@@ -467,8 +553,12 @@ const SetupPage: React.FC = () => {
                     explanation: genQ.explanation,
                     topic: topic,
                 });
+                const newProgress = Math.round((allQuestions.length / fullSettings.numberOfQuestions) * 100);
+                setGenerationProgress(Math.min(newProgress, 100));
             }
           });
+        } else if (!result.ok) {
+            throw new Error(result.reason || "The AI failed to generate questions for the selected topics.");
         }
       }
 
@@ -477,6 +567,7 @@ const SetupPage: React.FC = () => {
       if (questions.length === 0) {
         setError("The AI failed to generate any questions for the selected topics. This can happen if the source material is insufficient. Please try again with different topics.");
         setLoading(false);
+        setGenerationProgress(null);
         return;
       }
       
@@ -486,6 +577,7 @@ const SetupPage: React.FC = () => {
       setError(err.message || 'An unknown error occurred while generating questions.');
     } finally {
       setLoading(false);
+      setGenerationProgress(null);
     }
   };
 
@@ -519,39 +611,38 @@ const SetupPage: React.FC = () => {
     Promise.all(fileReadPromises)
         .then(jsonStrings => {
             let allQuestions: Question[] = [];
-            const allTopics = new Set<string>();
             let questionIdCounter = 0;
 
             jsonStrings.forEach((jsonString, index) => {
                 try {
                     const questions = parseAndTransformQuizData(jsonString, questionIdCounter);
-                    
-                    questions.forEach(q => allTopics.add(q.topic));
-                    
                     allQuestions.push(...questions);
                     questionIdCounter += questions.length;
-
                 } catch(e: any) {
                     throw new Error(`Error processing file #${index + 1}: ${e.message}`);
                 }
             });
+            
+            const totalCount = settings.numberOfQuestions;
 
-            if (allQuestions.length === 0) {
-                throw new Error("The selected file(s) contain no valid questions or could not be parsed.");
+            if (allQuestions.length < totalCount) {
+                throw new Error(`Not enough questions for a full assessment. Uploaded files contain ${allQuestions.length} questions, but ${totalCount} are needed.`);
             }
 
+            const finalQuestions = selectAssessmentQuestions(allQuestions, totalCount);
+
             const combinedSettings: QuizSettings = {
-                topics: Array.from(allTopics),
+                topics: ['Loaded Assessment Mix'],
                 difficulty: ['Médio'],
-                numberOfQuestions: allQuestions.length,
-                mode: 'practice',
+                numberOfQuestions: finalQuestions.length,
+                mode: 'assessment',
             };
 
-            startQuiz(combinedSettings, allQuestions);
+            startQuiz(combinedSettings, finalQuestions.map((q, i) => ({ ...q, id: i })));
             navigate('/quiz');
 
         }).catch((err: any) => {
-            setError(`Failed to load quiz from file(s): ${err.message}`);
+            setError(`Failed to load assessment from file(s): ${err.message}`);
         }).finally(() => {
             setLoading(false);
             if (event.target) {
@@ -560,10 +651,10 @@ const SetupPage: React.FC = () => {
         });
   };
   
-  const handleAssessmentFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInspirationFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-        setAssessmentFiles(Array.from(files));
+        setInspirationFiles(Array.from(files));
     }
   };
 
@@ -585,7 +676,7 @@ const SetupPage: React.FC = () => {
     return effectiveSettings.topics.filter(t => (childrenMap.get(t) || []).length === 0).length;
   }, [effectiveSettings.topics, childrenMap]);
 
-  const startButtonDisabled = isLoading || (isGeneratorMode && leafTopicCount === 0) || (isAssessmentMode && assessmentFiles.length === 0);
+  const startButtonDisabled = isLoading || (isGeneratorMode && leafTopicCount === 0) || (isAssessmentMode && inspirationFiles.length === 0);
 
   return (
     <div className="animate-fade-in max-w-5xl mx-auto">
@@ -599,8 +690,8 @@ const SetupPage: React.FC = () => {
       />
       <input
           type="file"
-          ref={assessmentFileInputRef}
-          onChange={handleAssessmentFileChange}
+          ref={inspirationFileInputRef}
+          onChange={handleInspirationFileChange}
           className="hidden"
           accept=".json"
           multiple
@@ -718,7 +809,7 @@ const SetupPage: React.FC = () => {
         </Card>
         <Card>
             <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">3. Number of Questions</h2>
-            {!isGeneratorMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md -mt-2 mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Fixed for the selected mode.</div>}
+            {isSimuladoMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md -mt-2 mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Fixed for the selected mode.</div>}
             <div className="flex flex-col items-center justify-center h-full">
                 <span className="text-6xl font-bold text-red-600 mb-4">{effectiveSettings.numberOfQuestions}</span>
                 <input
@@ -726,9 +817,9 @@ const SetupPage: React.FC = () => {
                 min="1"
                 max="50"
                 value={effectiveSettings.numberOfQuestions}
-                onChange={(e) => isGeneratorMode && setSettings(prev => ({...prev, numberOfQuestions: parseInt(e.target.value, 10)}))}
+                onChange={(e) => !isSimuladoMode && setSettings(prev => ({...prev, numberOfQuestions: parseInt(e.target.value, 10)}))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!isGeneratorMode}
+                disabled={isSimuladoMode}
                 />
             </div>
         </Card>
@@ -738,19 +829,12 @@ const SetupPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">4. Choose Game Mode</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mt-4">
           <ModeCard icon="fa-graduation-cap" title="Practice" description="No time limit, learn and review at your own pace." value="practice" />
-          <ModeCard icon="fa-clipboard-question" title="Assessment" description="Upload your question banks for an initial knowledge evaluation based on exam weights." value="assessment">
-            {mode === 'assessment' && (
-               <div className="mt-4 border-t pt-4 space-y-3 animate-fade-in text-left">
-                  <Button onClick={() => assessmentFileInputRef.current?.click()} className="w-full bg-slate-700 hover:bg-slate-800 focus:ring-slate-500 text-sm">
-                      <i className="fa-solid fa-upload mr-2"></i> Upload Question Files
-                  </Button>
-                  {assessmentFiles.length > 0 && (
-                      <ul className="text-xs text-slate-500 space-y-1">
-                          {assessmentFiles.map(f => <li key={f.name} className="truncate">✓ {f.name}</li>)}
-                      </ul>
-                  )}
-               </div>
-            )}
+          <ModeCard icon="fa-clipboard-question" title="Assessment" description="Upload your question banks for a timed evaluation based on official exam weights." value="assessment">
+             <div className="mt-4 border-t pt-4">
+                <p className="text-xs text-slate-600 text-center">
+                    <i className="fa-solid fa-arrow-down mr-1"></i> Upload your files in the "Advanced Settings" section below.
+                </p>
+            </div>
           </ModeCard>
           <ModeCard icon="fa-file-alt" title="Full Simulator" description="A 20-question version for a quick test of the exam format." value="timed" />
           <ModeCard icon="fa-book-open" title="1/2 Simulator" description="Extended simulation with 50 questions for in-depth practice." value="timed_half" />
@@ -763,7 +847,7 @@ const SetupPage: React.FC = () => {
             <div>
                 <label htmlFor="align-switch" className="font-semibold text-slate-800">Align with Official Exam Style</label>
                 <p className="text-sm text-slate-500 mt-1">
-                    AI will generate questions mimicking various official formats (e.g., ordering, choose two/three, pairing).
+                    AI will generate questions mimicking official formats. In Assessment mode, this will generate <span className="font-bold">new questions</span> based on your uploaded files.
                 </p>
             </div>
             <label htmlFor="align-switch" className="relative inline-flex items-center cursor-pointer">
@@ -777,14 +861,46 @@ const SetupPage: React.FC = () => {
                 <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
             </label>
         </div>
+         <div className="mt-4 border-t pt-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div className="mb-3 md:mb-0 md:mr-4">
+                    <label className="font-semibold text-slate-800">Use Your Files as Inspiration</label>
+                    <p className="text-sm text-slate-500 mt-1">
+                        Upload JSON question banks. When "Align with Exam Style" is on, the AI will generate new questions inspired by your files. Works for Practice and Assessment modes.
+                    </p>
+                </div>
+                <div>
+                    <Button onClick={() => inspirationFileInputRef.current?.click()} className="bg-slate-700 hover:bg-slate-800 focus:ring-slate-500 text-sm whitespace-nowrap">
+                        <i className="fa-solid fa-upload mr-2"></i> Upload Files
+                    </Button>
+                </div>
+            </div>
+            {inspirationFiles.length > 0 && (
+            <div className="p-3">
+                <ul className="text-xs text-slate-500 space-y-1">
+                    {inspirationFiles.map(f => <li key={f.name} className="truncate">✓ {f.name}</li>)}
+                </ul>
+            </div>
+            )}
+        </div>
       </Card>
       
       <div className="mt-8 text-center">
         <Button onClick={handleStartQuiz} disabled={startButtonDisabled} className="text-xl px-12 py-4 w-full md:w-auto">
           {isLoading && !error ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-              {isAssessmentMode ? 'Building Assessment...' : 'Generating Quiz...'}
+             <div className="w-full" style={{ minWidth: '220px' }}>
+                <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    <span>
+                    {isAssessmentMode ? 'Building Assessment...' : 'Generating Quiz...'}
+                    {generationProgress !== null && ` (${generationProgress}%)`}
+                    </span>
+                </div>
+                {generationProgress !== null && (
+                    <div className="w-full bg-white/30 rounded-full h-1.5 mt-2">
+                    <div className="bg-white h-1.5 rounded-full transition-all duration-300" style={{ width: `${generationProgress}%` }}></div>
+                    </div>
+                )}
             </div>
           ) : (
             <>
@@ -794,7 +910,7 @@ const SetupPage: React.FC = () => {
         </Button>
          <p className="text-xs text-slate-400 mt-4">
             {isGeneratorMode && `Topics selected: ${leafTopicCount}`}
-            {isAssessmentMode && `Files uploaded: ${assessmentFiles.length}`}
+            {isAssessmentMode && `Files uploaded: ${inspirationFiles.length}`}
          </p>
       </div>
 
@@ -807,8 +923,8 @@ const SetupPage: React.FC = () => {
       <Card className="mb-8">
         <div className="text-center">
           <i className="fa-solid fa-file-import text-3xl mb-3 text-slate-500"></i>
-          <h2 className="text-2xl font-bold text-gray-700 mb-2">Load Quiz from File</h2>
-          <p className="text-slate-600 mb-6">Take a quiz using one or more pre-made JSON files.</p>
+          <h2 className="text-2xl font-bold text-gray-700 mb-2">Load Assessment from File</h2>
+          <p className="text-slate-600 mb-6">Run a full assessment using pre-made JSON question banks.</p>
           <Button onClick={() => fileInputRef.current?.click()} disabled={isLoading} className="bg-slate-700 hover:bg-slate-800 focus:ring-slate-500">
              {isLoading && error ? (
                 <>Loading...</>
