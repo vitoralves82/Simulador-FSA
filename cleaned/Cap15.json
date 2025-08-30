@@ -1,0 +1,488 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "chapter": "15 - Considerations for investor use",
+    "part": "IV",
+    "generatedAt": "2025-08-30T00:00:00Z",
+    "notes": "Questões baseadas no Capítulo 15 do Guia de Estudos FSA Nível I. Gabarito ao final.",
+    "sources": [
+      "FSA Level I Study Guide – Chapter 15"
+    ]
+  },
+  "items": [
+    {
+      "id": "C15-Q01",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investment Strategies",
+        "Values vs Value"
+      ],
+      "stem": "On the spectrum from 'values-focused' to 'value-focused' investing, which option correctly arranges the strategies from most values-focused (left) to most value-focused (right)?",
+      "options": [
+        "ESG Integration -> Thematic Investing -> Impact Investing -> Exclusionary Screening",
+        "Impact Investing -> Exclusionary Screening -> Thematic Investing -> ESG Integration",
+        "Thematic Investing -> ESG Integration -> Exclusionary Screening -> Impact Investing",
+        "Exclusionary Screening -> Impact Investing -> ESG Integration -> Thematic Investing"
+      ]
+    },
+    {
+      "id": "C15-Q02",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Fixed Income",
+        "Credit Analysis"
+      ],
+      "stem": "When integrating sustainability information into corporate fixed-income analysis, what is the primary focus for investors?",
+      "options": [
+        "The upside growth potential and revenue enhancement opportunities of a firm.",
+        "Evaluating and pricing downside risk, particularly default probability and loss severity.",
+        "Engaging in active ownership through proxy voting and shareholder resolutions.",
+        "The company's philanthropic and community engagement activities."
+      ]
+    },
+    {
+      "id": "C15-Q03",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Investor Challenges",
+        "Data Quality"
+      ],
+      "stem": "Investors face several significant challenges when using currently available sustainability information. Which THREE of the following are among the most common challenges? (Choose three)",
+      "options": [
+        "Companies often disclose binary policies instead of comparable performance data.",
+        "There is an overabundance of perfectly standardized and comparable quantitative data.",
+        "ESG ratings from different providers exhibit very low correlation with one another.",
+        "Disclosure is often not comprehensive, covering only certain business segments.",
+        "All disclosed sustainability data is required to undergo reasonable assurance.",
+        "Investors are demanding less information from companies."
+      ]
+    },
+    {
+      "id": "C15-Q04",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investment Strategies",
+        "Definitions"
+      ],
+      "stem": "Which pairing correctly matches the investment strategy with its primary objective?",
+      "options": [
+        "Exclusionary Screening : Incorporating ESG factors into traditional financial models to adjust valuations.",
+        "ESG Integration : Targeting companies that show significant recent improvement in ESG scores, rather than top performers.",
+        "Impact Investing : Acting with the explicit and measurable goal of achieving positive social or environmental impact alongside financial returns.",
+        "Momentum Strategy : Avoiding investments based on internationally accepted norms, such as UN Global Compact violations."
+      ]
+    },
+    {
+      "id": "C15-Q05",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Passive Investing",
+        "Index Construction"
+      ],
+      "stem": "An index fund is constructed to track the S&P 500 but is weighted to give greater prominence to companies with low carbon emissions. What is this strategy known as?",
+      "options": [
+        "A norms-based screen",
+        "An ESG tilt",
+        "A momentum strategy",
+        "A thematic bond"
+      ]
+    },
+    {
+      "id": "C15-Q06",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Private Markets",
+        "Due Diligence"
+      ],
+      "stem": "How is sustainability information typically used during the due diligence process in private markets?",
+      "options": [
+        "It is generally ignored as it is only relevant for publicly listed companies.",
+        "To inform the investment decision and develop post-investment action plans for managing identified risks and opportunities.",
+        "Only to screen out companies in the tobacco and weapons industries.",
+        "To assess short-term stock price volatility."
+      ]
+    },
+    {
+      "id": "C15-Q07",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investment Strategies",
+        "Screening"
+      ],
+      "stem": "An investor's strategy excludes any company that does not adhere to the Universal Declaration of Human Rights. This is an example of:",
+      "options": [
+        "Values-based screening",
+        "Best-in-class screening",
+        "Norms-based screening",
+        "Thematic investing"
+      ]
+    },
+    {
+      "id": "C15-Q08",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Fundamental Analysis",
+        "Valuation"
+      ],
+      "stem": "The IFRS Sustainability Disclosure Standards support fundamental analysis. Which TWO ways can the produced data be incorporated into company valuation? (Choose two)",
+      "options": [
+        "By replacing all traditional financial metrics with sustainability metrics.",
+        "More predictable factors can be incorporated into earnings projections in a DCF model.",
+        "By focusing exclusively on a company's past performance without considering future prospects.",
+        "Less measurable factors can be reflected in an adjustment to the discount rate.",
+        "By ensuring that all company valuations are identical across an industry."
+      ]
+    },
+    {
+      "id": "C15-Q09",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investor Challenges",
+        "ESG Ratings"
+      ],
+      "stem": "Why does the low correlation among ESG ratings from different providers (e.g., 0.61 on average) pose a significant problem for the market?",
+      "options": [
+        "It indicates that all providers are using the exact same methodology, reducing diversity.",
+        "It makes it easier for investors to choose a single, reliable rating.",
+        "It can lead to a false sense of confidence, and stock and bond prices are unlikely to properly reflect a company's actual ability to manage sustainability-related risks.",
+        "It proves that sustainability performance has no impact on a company's financial value."
+      ]
+    },
+    {
+      "id": "C15-Q10",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Post-investment Engagement",
+        "Active Ownership"
+      ],
+      "stem": "When investors lack sufficient disclosures from a company, how can they use the IFRS/SASB Standards in their engagement activities?",
+      "options": [
+        "They cannot use the standards, as they are only for companies.",
+        "As a playbook for engaging companies on material topics and encouraging improved disclosure.",
+        "To file a lawsuit against the company for non-compliance.",
+        "To develop their own proprietary, non-comparable metrics."
+      ]
+    },
+    {
+      "id": "C15-Q11",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investment Strategies",
+        "Inclusionary"
+      ],
+      "stem": "An active equity manager selects companies that, while not top ESG performers, have demonstrated significant, recent improvement in their ESG scores. This is an example of what type of strategy?",
+      "options": [
+        "A best-in-class strategy",
+        "An exclusionary screening strategy",
+        "A momentum (or directional) strategy",
+        "An impact investing strategy"
+      ]
+    },
+    {
+      "id": "C15-Q12",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Private Markets",
+        "Engagement"
+      ],
+      "stem": "Why can engagement with portfolio companies on sustainability topics be more frequent and robust in private equity compared to public equity?",
+      "options": [
+        "Because private equity investors have no control or influence over their portfolio companies.",
+        "Because private equity funds often have longer investment horizons and may take a majority-control stake.",
+        "Because private companies are legally required to disclose more sustainability information than public companies.",
+        "Because sustainability risks are not relevant in private markets."
+      ]
+    },
+    {
+      "id": "C15-Q13",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investor Challenges",
+        "Comparability"
+      ],
+      "stem": "A study of 50 Fortune 500 companies found that employee health and safety data was reported in over 20 different ways, using different units of measure. This is a primary example of which challenge for investors?",
+      "options": [
+        "Companies disclosing policies, not performance.",
+        "ESG ratings having low correlation.",
+        "Quantitative data not being comparable.",
+        "Sustainability disclosure not being comprehensive."
+      ]
+    },
+    {
+      "id": "C15-Q14",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Impact Investing",
+        "Characteristics"
+      ],
+      "stem": "Which THREE of the following are distinguishing characteristics of impact investing? (Choose three)",
+      "options": [
+        "The investor acts with the explicit goal (intention) of achieving social or environmental impact.",
+        "Financial returns are never a consideration.",
+        "The impact generated by the investment is measured and reported.",
+        "The strategy is identical to exclusionary screening.",
+        "Impact data informs decision-making to manage and maximize positive outcomes.",
+        "It can only be applied through public equities."
+      ]
+    },
+    {
+      "id": "C15-Q15",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Sector Allocation",
+        "Systemic Risk"
+      ],
+      "stem": "How can a sustainability-based industry classification system, such as SICS, be used in conjunction with a traditional system like GICS to improve portfolio management?",
+      "options": [
+        "To increase the correlation between sectors, thereby increasing systemic risk.",
+        "To provide an additional lens to assess sector correlation, which can help in mitigating systemic risk.",
+        "To prove that sustainability factors are irrelevant at the sector level.",
+        "To replace all financial analysis with sustainability analysis."
+      ]
+    },
+    {
+      "id": "C15-Q16",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investor Reporting",
+        "Benchmarks"
+      ],
+      "stem": "Some investment firms believe that since ESG integration improves the investment selection process, the performance of sustainable investment funds should be judged against what type of benchmark?",
+      "options": [
+        "Only against other, specialized sustainability benchmarks.",
+        "Against no benchmark at all.",
+        "Only against common non-ESG benchmarks like the S&P 500, to prove their competitive performance.",
+        "Against the performance of philanthropic donations."
+      ]
+    },
+    {
+      "id": "C15-Q17",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Fixed Income",
+        "Thematic Bonds"
+      ],
+      "stem": "A corporation issues a bond where the proceeds are specifically earmarked to finance a new solar energy infrastructure project. This is an example of a:",
+      "options": [
+        "Standard corporate bond",
+        "Junk bond",
+        "Green bond",
+        "Convertible bond"
+      ]
+    },
+    {
+      "id": "C15-Q18",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Pre-investment",
+        "Data Sourcing"
+      ],
+      "stem": "When investors struggle to find the 'signal in the noise' of a vast data landscape, how can they use the disclosure topics within the IFRS/SASB Standards in their pre-investment stage?",
+      "options": [
+        "To create more noise by requesting irrelevant data.",
+        "As a template to identify which risks and opportunities are reasonably likely to affect a company's prospects, helping them focus on what data is needed.",
+        "To perform a full financial audit of the company.",
+        "To replace their entire investment analysis process."
+      ]
+    },
+    {
+      "id": "C15-Q19",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Investor Use",
+        "Fiduciary Duty"
+      ],
+      "stem": "Which TWO of the following are common reasons why investors use sustainability information? (Choose two)",
+      "options": [
+        "To decrease their financial returns intentionally.",
+        "To fulfill a fiduciary duty to consider all material risks, including sustainability-related risks.",
+        "To align their investments with personal or organizational missions, such as environmental protection.",
+        "To ensure their portfolios are less diversified.",
+        "To exclusively invest in companies with poor governance."
+      ]
+    },
+    {
+      "id": "C15-Q20",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Passive Investing",
+        "Data Needs"
+      ],
+      "stem": "Why is the availability of comparable, consistent, and reliable data particularly critical for index-based (passive) investing?",
+      "options": [
+        "Because passive investors conduct deep, fundamental analysis on every individual company.",
+        "Because index investors develop a formula applied to companies at scale with limited human intervention, so the quality of the data inputs is crucial.",
+        "Because passive investors have access to non-public information that active investors do not.",
+        "Because index funds are not affected by the quality of the underlying data."
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "C15-Q01",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The spectrum generally moves from strategies driven by ethical concerns (Impact, Exclusionary) to those fully integrating ESG into financial analysis for value creation (ESG Integration)."
+    },
+    {
+      "id": "C15-Q02",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Fixed-income analysis focuses almost exclusively on downside risk that could inhibit a company's ability to make predetermined payments, such as default risk."
+    },
+    {
+      "id": "C15-Q03",
+      "correctOptionIndices": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "Key challenges include the prevalence of binary policy disclosures over performance data, low correlation among ESG raters, and incomplete data coverage from companies."
+    },
+    {
+      "id": "C15-Q04",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Impact investing is defined by its explicit intention to create measurable positive impacts alongside a financial return. The other options misrepresent their respective strategies."
+    },
+    {
+      "id": "C15-Q05",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "An 'ESG tilt' is a strategy where a fund tracks a benchmark index, but the assets are weighted to favor desirable characteristics, such as low carbon emissions."
+    },
+    {
+      "id": "C15-Q06",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "In private equity, sustainability due diligence informs the investment decision and helps create post-investment plans to manage risks and add portfolio value."
+    },
+    {
+      "id": "C15-Q07",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Norms-based screening excludes investments based on a company's behavior regarding internationally accepted norms, such as the Universal Declaration of Human Rights."
+    },
+    {
+      "id": "C15-Q08",
+      "correctOptionIndices": [
+        1,
+        3
+      ],
+      "explanation": "In DCF analysis, predictable factors can adjust earnings forecasts, while less quantifiable factors can be reflected in a discount rate adjustment."
+    },
+    {
+      "id": "C15-Q09",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Low correlation between raters creates confusion and means market prices are unlikely to accurately reflect a company's true ESG risk management, hindering efficient price discovery."
+    },
+    {
+      "id": "C15-Q10",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The standards provide a clear, investor-focused roadmap of material topics, which investors can use to frame their requests for improved disclosure and guide engagement dialogues."
+    },
+    {
+      "id": "C15-Q11",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "A momentum strategy targets companies that are not yet top performers but are demonstrating significant improvement, predicting larger relative gains."
+    },
+    {
+      "id": "C15-Q12",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Private equity's longer horizons and potential for majority-control stakes allow for a closer, more involved relationship and more robust engagement on sustainability."
+    },
+    {
+      "id": "C15-Q13",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Reporting the same topic in many different ways with different units is a classic example of how quantitative data can lack comparability, limiting its usefulness."
+    },
+    {
+      "id": "C15-Q14",
+      "correctOptionIndices": [
+        0,
+        2,
+        4
+      ],
+      "explanation": "Impact investing is distinguished by the explicit intention to create impact, the measurement of that impact, and the management of performance to maximize it."
+    },
+    {
+      "id": "C15-Q15",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Using a sustainability lens like SICS can reveal different correlations between sectors than a purely financial one, helping investors reduce systemic portfolio risk."
+    },
+    {
+      "id": "C15-Q16",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Some firms argue that if ESG integration genuinely improves risk-adjusted returns, the resulting portfolio should be competitive enough to be judged against standard market benchmarks."
+    },
+    {
+      "id": "C15-Q17",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "A green bond is a thematic bond created specifically to fund projects that have positive environmental or climate-related benefits."
+    },
+    {
+      "id": "C15-Q18",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Investors can use the standards as a template to identify material topics, helping them focus their data gathering and analysis on the information most likely to influence decisions."
+    },
+    {
+      "id": "C15-Q19",
+      "correctOptionIndices": [
+        1,
+        2
+      ],
+      "explanation": "Investors are motivated by both financial reasons (fulfilling fiduciary duty to manage all material risks) and values-based reasons (mission alignment)."
+    },
+    {
+      "id": "C15-Q20",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Index construction is rules-based and applied at scale. Without comparable and reliable data, the automated process would be 'garbage in, garbage out,' leading to flawed indices."
+    }
+  ]
+}

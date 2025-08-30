@@ -1,0 +1,557 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "chapter": "2 - The Historical Basis for Disclosure",
+    "part": "I",
+    "generatedAt": "2025-08-30T18:18:38.826353Z",
+    "notes": "Items first; answer key at the end to match exam-like experience.",
+    "sources": [
+      "FSA Level I Study Guide – Part I (historical basis for disclosure; materiality)"
+    ]
+  },
+  "items": [
+    {
+      "id": "C2-Q01",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Regulatory reform",
+        "Disclosure rationale"
+      ],
+      "stem": "In the post‑1929 context, why did corporate disclosure become the basis of regulatory reform?",
+      "options": [
+        "To replace investor judgment with government-directed security selection",
+        "Because transparency was understood as essential to protect investors and support fair, efficient markets",
+        "To mandate identical business models across listed firms",
+        "Because disclosure was intended only as public relations"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "After the 1929 crashes, reformers emphasized transparency to protect investors and restore orderly, efficient markets; disclosure served those ends rather than PR."
+    },
+    {
+      "id": "C2-Q02",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "US SEC",
+        "Purpose"
+      ],
+      "stem": "Which pairing best captures two core purposes behind the creation of the US SEC in the 1930s?",
+      "options": [
+        "Protect investors; influence corporate behavior toward sound market practices",
+        "Control monetary policy; set tax rates",
+        "Centralize bank supervision; set exchange rates",
+        "Replace corporate boards; pick industry winners"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Legislative history highlights protection of investors and shaping corporate conduct via disclosure to support market integrity."
+    },
+    {
+      "id": "C2-Q03",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "Market failures",
+        "Transparency"
+      ],
+      "stem": "Which TWO outcomes are commonly associated with a lack of transparent corporate disclosure? (Choose two)",
+      "options": [
+        "Erosion of investor confidence and market dysfunction",
+        "Automatic improvement in price discovery",
+        "Heightened risk of mis-selling and misleading offerings",
+        "Guaranteed GDP growth despite shocks"
+      ],
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Historical episodes show that opacity undermines confidence and can lead to misleading offerings; transparency aids, rather than harms, price discovery."
+    },
+    {
+      "id": "C2-Q04",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Caveat emptor",
+        "Role of disclosure"
+      ],
+      "stem": "Before modern securities regulation, investors were largely governed by caveat emptor. What changed with the SEC era?",
+      "options": [
+        "Caveat emptor was fully abolished and the state guaranteed returns",
+        "Caveat emptor remained, but firms gained an obligation to disclose to the investing public",
+        "Investors were barred from buying risky securities",
+        "Only government bonds could be issued"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The SEC complemented—rather than replaced—caveat emptor, adding mandatory disclosure obligations to enable informed decisions."
+    },
+    {
+      "id": "C2-Q05",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Timeline",
+        "Standardization"
+      ],
+      "stem": "Arrange the following developments in the logical historical sequence: (1) 1929 crash and calls for reform; (2) CAP/APB era; (3) Establishment of the FASB; (4) IASC formation and later evolution to IASB.",
+      "options": [
+        "1 → 2 → 3 → 4",
+        "1 → 3 → 2 → 4",
+        "2 → 1 → 3 → 4",
+        "1 → 2 → 4 → 3"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Reform momentum followed the 1929 crash; US standard-setting evolved from CAP to APB, then to a full‑time FASB; in parallel, the IASC formed and later became the IASB."
+    },
+    {
+      "id": "C2-Q06",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Historical cost"
+      ],
+      "stem": "Under historical cost accounting as widely used in the 1930s–50s, how are assets generally measured on the balance sheet?",
+      "options": [
+        "At current fair value updated each quarter",
+        "At original purchase price (nominal value) even if market value changes over time",
+        "At replacement cost only when markets are volatile",
+        "At the higher of cost or market with quarterly revaluations"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Historical cost measures assets at the original cost; later debates considered whether that served decision‑usefulness as markets evolved."
+    },
+    {
+      "id": "C2-Q07",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Decision‑usefulness",
+        "Purpose shift"
+      ],
+      "stem": "Which statement best describes the profession’s 1960s shift toward ‘decision‑usefulness’?",
+      "options": [
+        "Financial statements exist solely to record past transactions accurately, independent of user decisions",
+        "Disclosure should prioritize forward‑looking relevance to inform users’ economic decisions",
+        "Accounting should abandon accuracy for narratives",
+        "Only cash flow statements matter for decisions"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The purpose was reframed toward informing investor decisions, emphasizing relevance (e.g., discounted future cash flows) alongside faithful representation."
+    },
+    {
+      "id": "C2-Q08",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Fragmentation",
+        "Comparability"
+      ],
+      "stem": "Which pairing BEST aligns a disclosure issue with its capital‑markets consequence?",
+      "options": [
+        "High fragmentation of methods → higher comparability for investors",
+        "Multiple methods for similar events → reduced comparability and decision‑usefulness",
+        "Uniform standards → less reliability",
+        "No audits → higher integrity"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Fragmented practices reduce comparability and usefulness; standardization and assurance improve decision‑useful information."
+    },
+    {
+      "id": "C2-Q09",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Standardization",
+        "Evolution"
+      ],
+      "stem": "Place the following on a spectrum from LESS standardized (left) to MORE standardized (right): (A) Ad‑hoc practices pre‑1930s; (B) CAP/APB guidance; (C) FASB; (D) IASB global alignment.",
+      "options": [
+        "A → B → C → D",
+        "B → A → C → D",
+        "A → C → B → D",
+        "A → B → D → C"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Standardization progressed from ad‑hoc practices to CAP/APB, then a dedicated FASB, and toward broad global alignment under IASB."
+    },
+    {
+      "id": "C2-Q10",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "Rationale for standards",
+        "Comparability"
+      ],
+      "stem": "Which TWO reasons most directly support standardization of disclosure and accounting practices? (Choose two)",
+      "options": [
+        "To increase comparability and decision‑usefulness across firms and markets",
+        "To ensure every company has the same strategy",
+        "To improve reliability and investor confidence via consistent methods",
+        "To eliminate professional judgment entirely"
+      ],
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Standards enhance comparability, reliability and confidence; they do not mandate identical strategies nor remove necessary judgment."
+    },
+    {
+      "id": "C2-Q11",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Assurance",
+        "Reliability"
+      ],
+      "stem": "Why are independent audits relevant to standardized disclosure?",
+      "options": [
+        "They replace management commentary entirely",
+        "They provide third‑party assurance that increases the perceived integrity and reliability of reported information",
+        "They determine macroeconomic policy",
+        "They remove the need for internal controls"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Audits complement standards by adding assurance, supporting integrity and reliability of information used by investors."
+    },
+    {
+      "id": "C2-Q12",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Purpose of standards"
+      ],
+      "stem": "At a high level, disclosure standards exist primarily to:",
+      "options": [
+        "Mandate identical financing structures",
+        "Deliver comparable, reliable, decision‑useful information for capital providers",
+        "Guarantee positive returns to investors",
+        "Reduce financial statements to narrative only"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards aim to support investor decision‑making through comparable and reliable information."
+    },
+    {
+      "id": "C2-Q13",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Fragmentation symptoms"
+      ],
+      "stem": "Which TWO observations most clearly indicate **fragmentation** that reduces usefulness to investors? (Choose two)",
+      "options": [
+        "Multiple accounting methods permitted for similar transactions across firms",
+        "Uniform presentation and consistent measurement",
+        "Lack of comparability for similar economic events",
+        "Widespread third‑party assurance of a single framework"
+      ],
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Allowing divergent methods for similar events and resulting lack of comparability are hallmarks of fragmentation that hinder decision‑usefulness."
+    },
+    {
+      "id": "C2-Q14",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Brandeis",
+        "Transparency"
+      ],
+      "stem": "Brandeis’s ‘sunlight as the best disinfectant’ became influential because it underscored that disclosure:",
+      "options": [
+        "Replaces markets with central planning",
+        "Serves investor protection and market discipline through transparency",
+        "Mandates identical profit margins across firms",
+        "Eliminates the need for enforcement"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "His metaphor emphasized transparency as a mechanism for discipline, investor protection and healthier markets."
+    },
+    {
+      "id": "C2-Q15",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Global markets",
+        "Comparability"
+      ],
+      "stem": "One major capital‑markets benefit of global accounting standardization is:",
+      "options": [
+        "Preventing cross‑border capital flows",
+        "Enabling investors to compare reports across jurisdictions with greater confidence",
+        "Outlawing industry‑specific metrics",
+        "Mandating a single audit firm globally"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Global alignment fosters cross‑border comparability and confidence, aiding capital allocation."
+    },
+    {
+      "id": "C2-Q16",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "US standard‑setting timeline"
+      ],
+      "stem": "Which statement is accurate regarding US standard‑setting bodies?",
+      "options": [
+        "The APB replaced the CAP, and later the FASB replaced the APB as a full‑time standard‑setter",
+        "The CAP replaced the FASB in 1973",
+        "The APB has always been full‑time and still exists",
+        "The FASB preceded the CAP historically"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "US progression was CAP → APB → FASB (full‑time), reflecting growing institutionalization of standard‑setting."
+    },
+    {
+      "id": "C2-Q17",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "International differences",
+        "Pre‑alignment"
+      ],
+      "stem": "Before international alignment, which TWO differences among jurisdictions were notable? (Choose two)",
+      "options": [
+        "Some allowed revaluation of PPE while others adhered to historical cost",
+        "Continental Europe/Japan sometimes linked accounting closely to taxation and used ‘secret reserves’",
+        "All countries used identical recognition and measurement rules",
+        "All jurisdictions banned revaluations"
+      ],
+      "correctOptionIndices": [
+        0,
+        1
+      ],
+      "explanation": "Jurisdictions differed—for example, revaluations allowed in some Commonwealth countries and tax‑driven practices with secret reserves in others."
+    },
+    {
+      "id": "C2-Q18",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "IASC/IASB evolution"
+      ],
+      "stem": "The International Accounting Standards Committee (IASC) evolved into the IASB in which year?",
+      "options": [
+        "1959",
+        "1973",
+        "2001",
+        "2010"
+      ],
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The IASC became the IASB in 2001 under the IFRS Foundation’s governance framework."
+    },
+    {
+      "id": "C2-Q19",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "IFRS adoption"
+      ],
+      "stem": "Approximately how many jurisdictions require or permit IFRS Accounting Standards for public companies today?",
+      "options": [
+        "Fewer than 20",
+        "About 50",
+        "More than 140",
+        "Exactly 200"
+      ],
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "IFRS Accounting Standards are required by public companies in more than 140 jurisdictions, with broader permitted use elsewhere."
+    },
+    {
+      "id": "C2-Q20",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Flexibility vs alignment"
+      ],
+      "stem": "Which statement best reflects global standardization’s relationship with local flexibility?",
+      "options": [
+        "Global standardization eliminates all local flexibility",
+        "High‑level alignment coexists with some local flexibility and company‑specific disclosures",
+        "Local flexibility is prohibited by the IASB",
+        "Standards require identical industry structures in all countries"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards provide common principles and comparability while allowing some local practices and entity‑specific disclosures."
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "C2-Q01",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "After the 1929 crashes, reformers emphasized transparency to protect investors and restore orderly, efficient markets; disclosure served those ends rather than PR."
+    },
+    {
+      "id": "C2-Q02",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Legislative history highlights protection of investors and shaping corporate conduct via disclosure to support market integrity."
+    },
+    {
+      "id": "C2-Q03",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Historical episodes show that opacity undermines confidence and can lead to misleading offerings; transparency aids, rather than harms, price discovery."
+    },
+    {
+      "id": "C2-Q04",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The SEC complemented—rather than replaced—caveat emptor, adding mandatory disclosure obligations to enable informed decisions."
+    },
+    {
+      "id": "C2-Q05",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Reform momentum followed the 1929 crash; US standard-setting evolved from CAP to APB, then to a full‑time FASB; in parallel, the IASC formed and later became the IASB."
+    },
+    {
+      "id": "C2-Q06",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Historical cost measures assets at the original cost; later debates considered whether that served decision‑usefulness as markets evolved."
+    },
+    {
+      "id": "C2-Q07",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The purpose was reframed toward informing investor decisions, emphasizing relevance (e.g., discounted future cash flows) alongside faithful representation."
+    },
+    {
+      "id": "C2-Q08",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Fragmented practices reduce comparability and usefulness; standardization and assurance improve decision‑useful information."
+    },
+    {
+      "id": "C2-Q09",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Standardization progressed from ad‑hoc practices to CAP/APB, then a dedicated FASB, and toward broad global alignment under IASB."
+    },
+    {
+      "id": "C2-Q10",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Standards enhance comparability, reliability and confidence; they do not mandate identical strategies nor remove necessary judgment."
+    },
+    {
+      "id": "C2-Q11",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Audits complement standards by adding assurance, supporting integrity and reliability of information used by investors."
+    },
+    {
+      "id": "C2-Q12",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards aim to support investor decision‑making through comparable and reliable information."
+    },
+    {
+      "id": "C2-Q13",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Allowing divergent methods for similar events and resulting lack of comparability are hallmarks of fragmentation that hinder decision‑usefulness."
+    },
+    {
+      "id": "C2-Q14",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "His metaphor emphasized transparency as a mechanism for discipline, investor protection and healthier markets."
+    },
+    {
+      "id": "C2-Q15",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Global alignment fosters cross‑border comparability and confidence, aiding capital allocation."
+    },
+    {
+      "id": "C2-Q16",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "US progression was CAP → APB → FASB (full‑time), reflecting growing institutionalization of standard‑setting."
+    },
+    {
+      "id": "C2-Q17",
+      "correctOptionIndices": [
+        0,
+        1
+      ],
+      "explanation": "Jurisdictions differed—for example, revaluations allowed in some Commonwealth countries and tax‑driven practices with secret reserves in others."
+    },
+    {
+      "id": "C2-Q18",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The IASC became the IASB in 2001 under the IFRS Foundation’s governance framework."
+    },
+    {
+      "id": "C2-Q19",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "IFRS Accounting Standards are required by public companies in more than 140 jurisdictions, with broader permitted use elsewhere."
+    },
+    {
+      "id": "C2-Q20",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards provide common principles and comparability while allowing some local practices and entity‑specific disclosures."
+    }
+  ]
+}

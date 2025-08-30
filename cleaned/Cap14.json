@@ -1,0 +1,479 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "chapter": "14 - Considerations for corporate use",
+    "part": "IV",
+    "generatedAt": "2025-08-30T00:00:00Z",
+    "notes": "Questões baseadas no Capítulo 14 do Guia de Estudos FSA Nível I. Gabarito ao final.",
+    "sources": [
+      "FSA Level I Study Guide – Chapter 14"
+    ]
+  },
+  "items": [
+    {
+      "id": "C14-Q01",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Cross-functional Roles",
+        "Disclosure Preparation"
+      ],
+      "stem": "Preparing sustainability-related financial disclosures requires a diverse set of internal stakeholders. Which THREE of the following roles are typically involved in this cross-functional process? (Choose three)",
+      "options": [
+        "Investor Relations",
+        "Legal Counsel",
+        "External Marketing Agency",
+        "Chief Sustainability Officer",
+        "Company competitors",
+        "Entry-level interns only"
+      ]
+    },
+    {
+      "id": "C14-Q02",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Reliable Information",
+        "Governance"
+      ],
+      "stem": "Which of the following is considered one of the three pillars of reliable sustainability information?",
+      "options": [
+        "A high volume of media mentions.",
+        "The use of multiple third-party ESG rating agencies.",
+        "Established internal controls for data collection, preparation, and disclosure.",
+        "A commitment to publish the report as late as possible after the financial report."
+      ]
+    },
+    {
+      "id": "C14-Q03",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Value Creation",
+        "Strategy"
+      ],
+      "stem": "A company's ability to create value through sustainability often progresses through stages. Select the arrangement that correctly orders these stages from initial, incremental value to more transformative value.",
+      "options": [
+        "1. New products/technologies -> 2. Optimizing efficiencies -> 3. New business models -> 4. Minimizing costs",
+        "4. Minimizing costs -> 2. Optimizing efficiencies -> 1. New products/technologies -> 3. New business models",
+        "2. Optimizing efficiencies -> 4. Minimizing costs -> 3. New business models -> 1. New products/technologies",
+        "3. New business models -> 1. New products/technologies -> 4. Minimizing costs -> 2. Optimizing efficiencies"
+      ]
+    },
+    {
+      "id": "C14-Q04",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Strategy",
+        "Terminology"
+      ],
+      "stem": "What is the key difference between a 'sustainability strategy' and a 'sustainable business strategy'?",
+      "options": [
+        "A 'sustainability strategy' is a company's plan to improve financial performance, while a 'sustainable business strategy' is a tactical response to a specific sustainability topic.",
+        "There is no difference; the terms are perfectly interchangeable.",
+        "A 'sustainability strategy' is often a tactical response to a specific topic, while a 'sustainable business strategy' is integrated into the core business to improve financial performance by managing ESG risks and opportunities.",
+        "A 'sustainability strategy' is mandatory for all public companies, while a 'sustainable business strategy' is voluntary."
+      ]
+    },
+    {
+      "id": "C14-Q05",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "ERM",
+        "Risk Management"
+      ],
+      "stem": "How can the IFRS Sustainability Disclosure Standards and its sources of guidance be used within a company's Enterprise Risk Management (ERM) process?",
+      "options": [
+        "Only to report on risks after they have already caused financial damage.",
+        "To replace the entire ERM framework with a sustainability-only framework.",
+        "To help identify, assess, and monitor sustainability-related risks that could affect the company's cash flows and prospects.",
+        "Exclusively for communicating with non-investor stakeholders."
+      ]
+    },
+    {
+      "id": "C14-Q06",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Preparing for Disclosure",
+        "Early Stages"
+      ],
+      "stem": "When a company is in the early stages of preparing its sustainability disclosure, which TWO actions are beneficial for understanding its reporting environment? (Choose two)",
+      "options": [
+        "Ignoring the disclosures of all peer companies to ensure originality.",
+        "Observing the reporting practices and metrics used by industry peers.",
+        "Assuming that regulatory requirements will never change.",
+        "Reviewing broader market trends such as investor statements and regulatory developments.",
+        "Focusing only on internal data without considering the external context."
+      ]
+    },
+    {
+      "id": "C14-Q07",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Internal Controls",
+        "Reliability"
+      ],
+      "stem": "A company's finance and sustainability teams are working to improve the reliability of their ESG data. Which internal control activity would best serve this purpose?",
+      "options": [
+        "Allowing any employee to alter data in the system without tracking changes.",
+        "Performing analytical reviews to follow up on unusual fluctuations and establishing automated tolerance limits that trigger warnings.",
+        "Collecting data only once every five years to reduce costs.",
+        "Keeping data in separate, unconnected spreadsheets managed by different departments."
+      ]
+    },
+    {
+      "id": "C14-Q08",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Cross-functional Roles",
+        "Responsibilities"
+      ],
+      "stem": "Which of the following correctly pairs a business role with its primary perspective in the sustainability disclosure process?",
+      "options": [
+        "Investor Relations : Providing perspective on legal risks related to the omission of information.",
+        "Board of Directors : Overseeing strategy and risk management, including the impact of sustainability on the business model.",
+        "Human Resources : Providing perspective on the technology architecture needed for reliable reporting.",
+        "Legal Counsel : Engaging with investors to understand their sustainability priorities."
+      ]
+    },
+    {
+      "id": "C14-Q09",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Data Quality",
+        "Gap Analysis"
+      ],
+      "stem": "When performing a gap analysis for sustainability data, a company identifies a metric for which it is already collecting similar, but not identical, data. What is the most appropriate next step?",
+      "options": [
+        "Immediately discard the existing data and start collecting new data from scratch.",
+        "Report the existing data without any changes or explanation.",
+        "Work with internal subject matter experts to evaluate whether the existing data needs to be changed to meet reporting objectives.",
+        "Decide not to report on the metric at all."
+      ]
+    },
+    {
+      "id": "C14-Q10",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "KPIs",
+        "Performance Management"
+      ],
+      "stem": "Research suggests that relying solely on the existence of elaborate ESG policies can be a poor indicator of actual performance because...",
+      "options": [
+        "policies always lead directly to improved performance.",
+        "companies with the best performance never have any written policies.",
+        "policies do not provide decision-useful performance data, and in some cases, may be written as a reaction to poor performance.",
+        "investors prefer to read long policy documents over quantitative performance metrics."
+      ]
+    },
+    {
+      "id": "C14-Q11",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Assurance",
+        "Levels"
+      ],
+      "stem": "An assurance engagement that is on par with a financial audit, examining source data and internal controls to provide a high level of confidence, is known as:",
+      "options": [
+        "Limited assurance",
+        "Reasonable assurance",
+        "A gap analysis",
+        "A peer review"
+      ]
+    },
+    {
+      "id": "C14-Q12",
+      "type": "multi",
+      "part": "IV",
+      "topics": [
+        "Corporate Motivation",
+        "Why Disclose"
+      ],
+      "stem": "Beyond investor demand, what are TWO other key motivations for a company to issue sustainability disclosures? (Choose two)",
+      "options": [
+        "To clearly tell its own value creation story, potentially counter-balancing narratives from third-party ESG raters.",
+        "To fall behind its industry peers in transparency.",
+        "To improve internal performance management by illuminating new risks and opportunities.",
+        "To ensure that its stock price is not influenced by its sustainability performance.",
+        "To avoid any engagement with its board of directors."
+      ]
+    },
+    {
+      "id": "C14-Q13",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Organizational Buy-in",
+        "Leadership"
+      ],
+      "stem": "What is the primary role of senior leadership in creating organizational buy-in for integrating sustainability disclosure?",
+      "options": [
+        "To delegate all sustainability-related decisions to junior staff without any oversight.",
+        "To set the 'tone from the top' by prioritizing sustainability and ensuring necessary resources are available.",
+        "To argue that sustainability is a distraction from the company's core strategy.",
+        "To outsource the entire disclosure process without any internal involvement."
+      ]
+    },
+    {
+      "id": "C14-Q14",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Value Creation",
+        "Strategy Integration"
+      ],
+      "stem": "Integrating metrics from the IFRS Sustainability Disclosure Standards into a company's strategy process can be beneficial. Which TWO of the following are ways this integration supports a sustainable business strategy? (Choose two)",
+      "options": [
+        "It makes strategic analyses less complete by introducing non-financial data.",
+        "It helps align sustainability initiatives with financial performance by using investor-focused materiality.",
+        "It prevents the company from differentiating itself from its peers.",
+        "It can lead to more complete analyses, preventing unwelcome surprises for the company and its investors.",
+        "It guarantees that the company will not face any sustainability-related risks."
+      ]
+    },
+    {
+      "id": "C14-Q15",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Reporting Timeline",
+        "Investor Needs"
+      ],
+      "stem": "For sustainability-related financial information to be most useful to investors, when should it be provided?",
+      "options": [
+        "Six months after the financial statements are released.",
+        "At the same time as the company's financial statements.",
+        "Whenever the sustainability department has finished collecting the data, regardless of the fiscal calendar.",
+        "Only once every two years to show long-term trends."
+      ]
+    },
+    {
+      "id": "C14-Q16",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "ERM",
+        "COSO Framework"
+      ],
+      "stem": "A company is working to identify potential sustainability events that could negatively affect it and manage those risks within its risk appetite. According to the COSO ERM Framework, this activity is part of a process designed to...",
+      "options": [
+        "maximize all possible risks to increase potential returns.",
+        "provide reasonable assurance regarding the achievement of entity objectives.",
+        "operate separately from the company's strategy-setting process.",
+        "be established and implemented only by the internal audit team, without board or management involvement."
+      ]
+    },
+    {
+      "id": "C14-Q17",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Assurance",
+        "Trends"
+      ],
+      "stem": "Recent surveys on sustainability reporting show what trend regarding third-party assurance?",
+      "options": [
+        "The percentage of companies obtaining external assurance is decreasing significantly.",
+        "While the rate of assurance is growing, many engagements are for limited assurance and may only cover a selection of data points, like GHG emissions.",
+        "Nearly all companies now obtain reasonable assurance for their entire sustainability report.",
+        "Assurance is now legally required in every jurisdiction worldwide."
+      ]
+    },
+    {
+      "id": "C14-Q18",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Cross-functional Roles",
+        "Common Language"
+      ],
+      "stem": "How do the IFRS Sustainability Disclosure Standards help bridge the gap between a company's finance and sustainability teams?",
+      "options": [
+        "By focusing only on qualitative narratives that both teams can easily understand.",
+        "By requiring sustainability professionals to get an accounting certification.",
+        "By offering a common language that connects industry-specific sustainability issues and metrics to financial performance.",
+        "By separating the two functions so they never need to interact."
+      ]
+    },
+    {
+      "id": "C14-Q19",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Peer Effects",
+        "Disclosure Strategy"
+      ],
+      "stem": "Observing the disclosure behavior of industry peers can be a 'double-edged sword' for a company deciding on its sustainability reporting strategy. Why is this the case?",
+      "options": [
+        "Because it always forces companies to adopt the best possible disclosure practices immediately.",
+        "Because if peers have not started reporting, it can dampen a company's motivation to disclose and be a first mover.",
+        "Because peer disclosure has no influence on a company's decisions.",
+        "Because all companies in an industry are required to report the exact same information in the exact same format."
+      ]
+    },
+    {
+      "id": "C14-Q20",
+      "type": "single",
+      "part": "IV",
+      "topics": [
+        "Board Oversight",
+        "ERM"
+      ],
+      "stem": "What is the board of directors' integral role in overseeing a company's enterprise-wide approach to risk management (ERM)?",
+      "options": [
+        "To manage the day-to-day risk identification process.",
+        "To conduct the external assurance engagement themselves.",
+        "To assess the effectiveness of risk management processes and monitor the most significant risks the company may face.",
+        "To focus risk management solely on financial risks, excluding sustainability-related risks."
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "C14-Q01",
+      "correctOptionIndices": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "Investor Relations, Legal Counsel, and the Chief Sustainability Officer are all key roles in the cross-functional process of preparing disclosures[cite: 1471, 1474, 1496]."
+    },
+    {
+      "id": "C14-Q02",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The three pillars of reliable information are appropriate board oversight, established internal controls, and data assurance [cite: 2387-2390]."
+    },
+    {
+      "id": "C14-Q04",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "A 'sustainability strategy' is tactical and topic-specific, whereas a 'sustainable business strategy' is integrated into the core plan to improve financial performance by managing material ESG factors[cite: 1621, 1626]."
+    },
+    {
+      "id": "C14-Q05",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The standards support the ERM process by helping companies identify, assess, respond to, monitor, and report on sustainability-related risks and opportunities [cite: 1820-1835]."
+    },
+    {
+      "id": "C14-Q06",
+      "correctOptionIndices": [
+        1,
+        3
+      ],
+      "explanation": "In the early stages, companies benefit from observing peer reporting practices and reviewing broader market trends like regulatory developments to shape their disclosure strategy[cite: 2711]."
+    },
+    {
+      "id": "C14-Q07",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Analytical reviews and automated tolerance limits are examples of internal control activities that help mitigate the risk of incorrect data[cite: 2418, 2415]."
+    },
+    {
+      "id": "C14-Q08",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The Board of Directors is responsible for overseeing strategy and risk, including how sustainability impacts the business model[cite: 1457]. IR handles investor communication, and Legal handles legal risks."
+    },
+    {
+      "id": "C14-Q09",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "When a company has similar but not identical data, the correct step is to consult with internal experts to see if the data can be adapted to meet reporting objectives[cite: 2374]."
+    },
+    {
+      "id": "C14-Q10",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Research shows that policies alone don't provide useful performance information and can sometimes be a reaction to poor performance rather than a driver of positive change[cite: 1657, 1658]."
+    },
+    {
+      "id": "C14-Q11",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Reasonable assurance is the most rigorous level, on par with an audit, providing a high level of confidence by examining data and internal controls[cite: 2460]."
+    },
+    {
+      "id": "C14-Q12",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Companies are motivated to disclose to tell their own value creation story and to use the information gathering process to improve internal performance management[cite: 1564, 1581]."
+    },
+    {
+      "id": "C14-Q13",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Leadership plays an integral role by setting the 'tone from the top,' showing support, and ensuring resources are available to implement quality disclosure processes[cite: 2738, 2742]."
+    },
+    {
+      "id": "C14-Q14",
+      "correctOptionIndices": [
+        1,
+        3
+      ],
+      "explanation": "Integrating IFRS/SASB metrics helps align sustainability with financial performance due to the focus on materiality and leads to more complete analyses, which can prevent surprises[cite: 1667, 1674, 1675]."
+    },
+    {
+      "id": "C14-Q15",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "To allow for evaluation alongside financial statements, it is important that sustainability-related financial disclosures are provided at the same time[cite: 2604]."
+    },
+    {
+      "id": "C14-Q16",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The COSO ERM framework defines ERM as a process designed to manage risk within an organization's risk appetite to provide reasonable assurance of achieving objectives [cite: 1775-1777]."
+    },
+    {
+      "id": "C14-Q17",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "While assurance is increasing, many companies opt for limited assurance, and the scope is often narrow, focusing on specific data like GHG emissions[cite: 2653, 2671]."
+    },
+    {
+      "id": "C14-Q18",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The standards offer a 'common language' by connecting sustainability metrics to financial performance, enabling finance and sustainability specialists to communicate more effectively[cite: 1515]."
+    },
+    {
+      "id": "C14-Q19",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Peer effects can be a double-edged sword because a lack of disclosure from peers can reduce the motivation for a company to be a first mover, thus stifling transparency [cite: 1569-1571]."
+    },
+    {
+      "id": "C14-Q20",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "The board's role in ERM includes assessing the effectiveness of the overall risk management process and monitoring the most significant risks the company faces[cite: 1814, 1815]."
+    }
+  ]
+}

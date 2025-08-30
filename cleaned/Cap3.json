@@ -1,0 +1,559 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "chapter": "3 - Materiality: a guiding principle for required disclosure",
+    "part": "I",
+    "generatedAt": "2025-08-30T18:18:38.827245Z",
+    "notes": "Items first; answer key at the end to match exam-like experience.",
+    "sources": [
+      "FSA Level I Study Guide – Part I (historical basis for disclosure; materiality)"
+    ]
+  },
+  "items": [
+    {
+      "id": "C3-Q01",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "IASB definition",
+        "Materiality"
+      ],
+      "stem": "Which phrase completes the IASB notion of materiality: information is material if omitting, misstating, or ______ it could reasonably be expected to influence primary users’ decisions?",
+      "options": [
+        "revaluing",
+        "obscuring",
+        "hedging",
+        "reconciling"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The IASB emphasizes omissions, misstatements, and obscuration as pathways that can influence decisions of primary users."
+    },
+    {
+      "id": "C3-Q02",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "Foundations",
+        "Investor‑focused materiality"
+      ],
+      "stem": "Which TWO statements reflect foundational ideas underlying investor‑focused materiality? (Choose two)",
+      "options": [
+        "It is a function of the needs of primary users (investors, lenders, creditors)",
+        "It requires satisfying every possible information need of any stakeholder",
+        "It is contextual and assessed in relation to omissions/misstatements and their effects",
+        "It applies only to monetary information"
+      ],
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Investor‑focused materiality centers on primary users and context (effects of omission/misstatement). It neither serves all stakeholders equally nor only monetary data."
+    },
+    {
+      "id": "C3-Q03",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Primary users"
+      ],
+      "stem": "Who are considered the primary users for determining materiality in investor‑focused reporting?",
+      "options": [
+        "Existing and potential investors, lenders and other creditors",
+        "Customers and suppliers exclusively",
+        "Employees and NGOs exclusively",
+        "Only regulators and auditors"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Standards focus on providers of financial capital (investors, lenders, other creditors) as primary users."
+    },
+    {
+      "id": "C3-Q04",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Judgment"
+      ],
+      "stem": "Determining whether information is material is primarily:",
+      "options": [
+        "A mechanical threshold identical for all companies",
+        "A matter of judgment specific to the entity’s circumstances and users’ needs",
+        "A vote of all stakeholders",
+        "A fixed formula tied only to revenue size"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards stress that materiality is not prescriptive; preparers must apply judgment considering context and user needs."
+    },
+    {
+      "id": "C3-Q05",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "Decisions",
+        "Primary users"
+      ],
+      "stem": "Which THREE decisions are identified as typical for primary users in IFRS and thus relevant to materiality? (Choose three)",
+      "options": [
+        "Buying, selling, or holding equity/debt instruments",
+        "Providing or selling loans and other forms of credit",
+        "Exercising voting rights or otherwise influencing management",
+        "Selecting corporate philanthropy beneficiaries"
+      ],
+      "correctOptionIndices": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Primary users decide on investments, credit provision, and governance influence; philanthropy choices are not central to investor‑focused materiality."
+    },
+    {
+      "id": "C3-Q06",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Baseline knowledge"
+      ],
+      "stem": "What baseline assumption about primary users guides disclosure decisions?",
+      "options": [
+        "They possess no financial knowledge and rely solely on narratives",
+        "They have reasonable knowledge of business/economics and review information diligently",
+        "They are experts in auditing standards",
+        "They are assumed to be novices who cannot interpret financial statements"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards assume reasonable knowledge and diligence by users, guiding the level and focus of disclosures."
+    },
+    {
+      "id": "C3-Q07",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Filter",
+        "Over‑disclosure"
+      ],
+      "stem": "Why is materiality used as a filter in required disclosure?",
+      "options": [
+        "To reduce all quantitative disclosures",
+        "To avoid overwhelming users with immaterial detail while ensuring decision‑useful information is provided",
+        "To prohibit qualitative discussion",
+        "To prioritize marketing over financial relevance"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality helps include what matters for decisions and exclude noise that obscures usefulness."
+    },
+    {
+      "id": "C3-Q08",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Obscurement"
+      ],
+      "stem": "Which scenario best illustrates **obscurement**?",
+      "options": [
+        "A small computational error in a footnote is corrected next period",
+        "Material decline in profitability is masked by excessive adjusted figures and dense jargon that hides the change",
+        "A required risk factor is omitted inadvertently",
+        "An inventory misstatement changes COGS materially"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Obscurement covers burying or confusing presentation that hides material information, distinct from omission or misstatement."
+    },
+    {
+      "id": "C3-Q09",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Evolution",
+        "Reassessment over time"
+      ],
+      "stem": "Order the following to reflect how materiality can evolve: (1) Market practices and investor needs change; (2) Companies reassess what is material; (3) Disclosure adjusts to meet primary users’ needs; (4) New information becomes decision‑relevant.",
+      "options": [
+        "1 → 4 → 2 → 3",
+        "4 → 1 → 2 → 3",
+        "1 → 2 → 3 → 4",
+        "2 → 1 → 3 → 4"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "As markets evolve, new information becomes decision‑relevant; preparers reassess materiality and adjust disclosures accordingly."
+    },
+    {
+      "id": "C3-Q10",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Data→driver mapping"
+      ],
+      "stem": "Which pairing best matches a sustainability fact to a decision‑relevant financial driver for capital providers?",
+      "options": [
+        "Frequent safety incidents → potential cost increases and cash‑flow at risk",
+        "Clear, comparable disclosure → lower information comparability",
+        "Benign water stress for operations → elevated physical risk only",
+        "Governance weaknesses → higher earnings predictability"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Operational incidents can signal higher costs and cash‑flow risks—decision‑relevant for equity and credit analysis."
+    },
+    {
+      "id": "C3-Q11",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Users",
+        "Primary vs secondary"
+      ],
+      "stem": "Place the following from **primary users** (left) to **secondary users** (right): Investors/lenders/creditors; Management; Regulators; General public.",
+      "options": [
+        "Investors/lenders/creditors → Management → Regulators → General public",
+        "Management → Investors/lenders/creditors → Regulators → General public",
+        "Investors/lenders/creditors → Regulators → Management → General public",
+        "General public → Management → Regulators → Investors/lenders/creditors"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Investor‑focused reporting prioritizes providers of capital; others are secondary for materiality determinations."
+    },
+    {
+      "id": "C3-Q12",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Principles",
+        "Investor‑focus"
+      ],
+      "stem": "Which TWO statements best support investor‑focused materiality in practice? (Choose two)",
+      "options": [
+        "Consider the effect of omissions/misstatements on decisions by primary users",
+        "Disclose every detail to satisfy any stakeholder’s curiosity",
+        "Assume reasonable user competence to calibrate depth of disclosure",
+        "Prioritize marketing content over financial relevance"
+      ],
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Materiality emphasizes effects on primary users and assumes reasonable competence; exhaustive or marketing‑led disclosure is not the goal."
+    },
+    {
+      "id": "C3-Q13",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Non‑monetary info"
+      ],
+      "stem": "Which statement is correct regarding the nature of material information?",
+      "options": [
+        "Only monetary data can be material",
+        "Non‑monetary and qualitative information can be material if decision‑relevant",
+        "Only audited numbers can be material",
+        "Narrative is never material"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality can apply to qualitative and non‑monetary information when it influences investor decisions."
+    },
+    {
+      "id": "C3-Q14",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Omissions example",
+        "Forward‑looking"
+      ],
+      "stem": "A company plans expansion into a foreign‑currency market; the currency weakens materially. Even if IAS 21 effects were small this period, why might disclosure still be material?",
+      "options": [
+        "Because forward‑looking cash‑flow expectations tied to the strategy could be misleading if omitted",
+        "Because regulators require currency hedging by all firms",
+        "Because all foreign operations are immaterial by default",
+        "Because materiality ignores strategy narratives"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Materiality considers whether omission could mislead expectations of future cash flows relevant to investors’ decisions."
+    },
+    {
+      "id": "C3-Q15",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Change over time"
+      ],
+      "stem": "Why must companies reassess materiality over time?",
+      "options": [
+        "Investor information needs and company circumstances evolve",
+        "Materiality is fixed once per IPO",
+        "Auditors determine materiality for all future years",
+        "Materiality depends only on last year’s revenue"
+      ],
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Materiality is dynamic; shifts in users’ needs and company context require periodic reassessment."
+    },
+    {
+      "id": "C3-Q16",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "Other contexts"
+      ],
+      "stem": "Which TWO contexts use ‘materiality’ with definitions that differ from investor‑focused reporting? (Choose two)",
+      "options": [
+        "Audit planning and evaluation of misstatements",
+        "Risk management prioritization",
+        "IFRS investor‑focused financial reporting",
+        "Mandatory financial statements under securities law"
+      ],
+      "correctOptionIndices": [
+        0,
+        1
+      ],
+      "explanation": "Materiality is applied in auditing and risk contexts differently from investor‑focused financial reporting under IFRS."
+    },
+    {
+      "id": "C3-Q17",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Reasonable investor"
+      ],
+      "stem": "Which description best reflects the ‘reasonable investor’ baseline?",
+      "options": [
+        "A nitwit with no financial knowledge",
+        "An omniscient analyst with perfect foresight",
+        "A user with reasonable knowledge who diligently reviews information",
+        "A stakeholder with only ethical preferences"
+      ],
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Standards assume a baseline of reasonable knowledge and diligence—not naivety or omniscience."
+    },
+    {
+      "id": "C3-Q18",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Roles",
+        "Standards vs preparers"
+      ],
+      "stem": "In materiality determinations, what is the appropriate division of roles?",
+      "options": [
+        "Standard‑setters prescribe every entity‑specific disclosure via formulas",
+        "Preparers apply judgment within standards to decide what to disclose for their circumstances",
+        "Auditors decide all disclosures unilaterally",
+        "Investors write the financial statements"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards set frameworks; preparers exercise judgment to meet primary users’ needs given entity‑specific context."
+    },
+    {
+      "id": "C3-Q19",
+      "type": "multi",
+      "part": "I",
+      "topics": [
+        "IASB definition"
+      ],
+      "stem": "Which THREE elements are explicit in the IASB’s articulation of materiality? (Choose three)",
+      "options": [
+        "Entity‑specific aspect of relevance",
+        "Based on nature or magnitude (or both) of items",
+        "Obscurement can make information material",
+        "Requires identical thresholds across entities"
+      ],
+      "correctOptionIndices": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "The IASB definition stresses entity‑specific relevance, nature/magnitude, and that obscuration can render information material."
+    },
+    {
+      "id": "C3-Q20",
+      "type": "single",
+      "part": "I",
+      "topics": [
+        "Context"
+      ],
+      "stem": "When evaluating materiality, why must information be considered in the context of other disclosures?",
+      "options": [
+        "Because materiality is determined in isolation from users’ decisions",
+        "Because the effect on decisions depends on how the information interacts with the rest of the report",
+        "Because context is irrelevant if a number is large",
+        "Because only quantitative notes matter"
+      ],
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality hinges on the potential effect on decisions within the full disclosure set; context determines influence."
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "C3-Q01",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "The IASB emphasizes omissions, misstatements, and obscuration as pathways that can influence decisions of primary users."
+    },
+    {
+      "id": "C3-Q02",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Investor‑focused materiality centers on primary users and context (effects of omission/misstatement). It neither serves all stakeholders equally nor only monetary data."
+    },
+    {
+      "id": "C3-Q03",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Standards focus on providers of financial capital (investors, lenders, other creditors) as primary users."
+    },
+    {
+      "id": "C3-Q04",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards stress that materiality is not prescriptive; preparers must apply judgment considering context and user needs."
+    },
+    {
+      "id": "C3-Q05",
+      "correctOptionIndices": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Primary users decide on investments, credit provision, and governance influence; philanthropy choices are not central to investor‑focused materiality."
+    },
+    {
+      "id": "C3-Q06",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards assume reasonable knowledge and diligence by users, guiding the level and focus of disclosures."
+    },
+    {
+      "id": "C3-Q07",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality helps include what matters for decisions and exclude noise that obscures usefulness."
+    },
+    {
+      "id": "C3-Q08",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Obscurement covers burying or confusing presentation that hides material information, distinct from omission or misstatement."
+    },
+    {
+      "id": "C3-Q09",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "As markets evolve, new information becomes decision‑relevant; preparers reassess materiality and adjust disclosures accordingly."
+    },
+    {
+      "id": "C3-Q10",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Operational incidents can signal higher costs and cash‑flow risks—decision‑relevant for equity and credit analysis."
+    },
+    {
+      "id": "C3-Q11",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Investor‑focused reporting prioritizes providers of capital; others are secondary for materiality determinations."
+    },
+    {
+      "id": "C3-Q12",
+      "correctOptionIndices": [
+        0,
+        2
+      ],
+      "explanation": "Materiality emphasizes effects on primary users and assumes reasonable competence; exhaustive or marketing‑led disclosure is not the goal."
+    },
+    {
+      "id": "C3-Q13",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality can apply to qualitative and non‑monetary information when it influences investor decisions."
+    },
+    {
+      "id": "C3-Q14",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Materiality considers whether omission could mislead expectations of future cash flows relevant to investors’ decisions."
+    },
+    {
+      "id": "C3-Q15",
+      "correctOptionIndices": [
+        0
+      ],
+      "explanation": "Materiality is dynamic; shifts in users’ needs and company context require periodic reassessment."
+    },
+    {
+      "id": "C3-Q16",
+      "correctOptionIndices": [
+        0,
+        1
+      ],
+      "explanation": "Materiality is applied in auditing and risk contexts differently from investor‑focused financial reporting under IFRS."
+    },
+    {
+      "id": "C3-Q17",
+      "correctOptionIndices": [
+        2
+      ],
+      "explanation": "Standards assume a baseline of reasonable knowledge and diligence—not naivety or omniscience."
+    },
+    {
+      "id": "C3-Q18",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Standards set frameworks; preparers exercise judgment to meet primary users’ needs given entity‑specific context."
+    },
+    {
+      "id": "C3-Q19",
+      "correctOptionIndices": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "The IASB definition stresses entity‑specific relevance, nature/magnitude, and that obscuration can render information material."
+    },
+    {
+      "id": "C3-Q20",
+      "correctOptionIndices": [
+        1
+      ],
+      "explanation": "Materiality hinges on the potential effect on decisions within the full disclosure set; context determines influence."
+    }
+  ]
+}
