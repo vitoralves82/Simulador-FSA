@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { curriculumTopics } from '../data/courseData';
 import { useQuiz } from '../context/CourseContext';
@@ -6,7 +6,7 @@ import { generateQuestions } from '../services/geminiService';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Spinner from '../components/common/Spinner';
-import { QuizMode, QuizSettings, CourseTopic, Difficulty } from '../types';
+import { QuizMode, QuizSettings, CourseTopic, Difficulty, Question } from '../types';
 
 
 interface TopicItemProps {
@@ -14,6 +14,26 @@ interface TopicItemProps {
     selectedTopics: Set<string>;
     onTopicChange: (topic: CourseTopic, checked: boolean) => void;
     disabled: boolean;
+}
+
+// Helper types for parsing loaded JSON quizzes
+interface LoadedItem {
+  id: string;
+  type: 'single' | 'multi' | string;
+  topics: string[];
+  stem: string;
+  options: string[];
+}
+
+interface LoadedAnswer {
+  id: string;
+  correctOptionIndices: number[];
+  explanation: string;
+}
+
+interface LoadedQuiz {
+  items: LoadedItem[];
+  answerKey: LoadedAnswer[];
 }
 
 const TopicItem: React.FC<TopicItemProps> = ({ topic, selectedTopics, onTopicChange, disabled }) => {
@@ -66,6 +86,7 @@ const SetupPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { startQuiz, isLoading, setLoading, setError, error } = useQuiz();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [settings, setSettings] = useState<Pick<QuizSettings, 'topics' | 'difficulty' | 'numberOfQuestions'>>({
     topics: [curriculumTopics[0].subTopics![0].title],
@@ -73,6 +94,7 @@ const SetupPage: React.FC = () => {
     numberOfQuestions: 10,
   });
   const [mode, setMode] = useState<QuizMode>('practice');
+  const [alignWithExam, setAlignWithExam] = useState(true);
   const [lightningBaseTime, setLightningBaseTime] = useState(60);
   const [lightningBonusTime, setLightningBonusTime] = useState(4);
   const [notification, setNotification] = useState<string | null>(null);
@@ -235,7 +257,6 @@ const SetupPage: React.FC = () => {
     setError(null);
     setNotification(null);
     try {
-      // Use effectiveSettings for quiz generation, but filter to only send leaf topics to the AI
       const finalTopics = effectiveSettings.topics.filter(t => (childrenMap.get(t) || []).length === 0);
       
        if (finalTopics.length === 0) {
@@ -254,8 +275,62 @@ const SetupPage: React.FC = () => {
         fullSettings.lightningBaseTime = lightningBaseTime;
         fullSettings.lightningBonusTime = lightningBonusTime;
       }
+      
+      const allQuestions: Question[] = [];
+      let questionId = 0;
 
-      const questions = await generateQuestions(fullSettings);
+      const mapDifficulty = (d: Difficulty): 'easy' | 'medium' | 'hard' => {
+        if (d === 'Fácil') return 'easy';
+        if (d === 'Difícil') return 'hard';
+        return 'medium';
+      };
+      const geminiDifficulties = fullSettings.difficulty.map(mapDifficulty);
+      const questionsPerTopic = Math.ceil(fullSettings.numberOfQuestions / finalTopics.length);
+      
+      for (const topic of finalTopics) {
+        if (allQuestions.length >= fullSettings.numberOfQuestions) break;
+        
+        const count = Math.min(questionsPerTopic, fullSettings.numberOfQuestions - allQuestions.length);
+        if (count <= 0) break;
+
+        const result = await generateQuestions({
+            topic: topic,
+            count: count,
+            difficulty: geminiDifficulties[Math.floor(Math.random() * geminiDifficulties.length)],
+            alignWithExam: alignWithExam,
+        });
+
+        if (result.ok && result.data) {
+          result.data.forEach(genQ => {
+            if (allQuestions.length < fullSettings.numberOfQuestions) {
+                const correctOptionIndices = genQ.answer_keys.map(key => key.charCodeAt(0) - 65);
+                const cleanOptions = genQ.options.map(opt => opt.replace(/^[A-Z]\)\s*/, ''));
+
+                const correctAnswers = correctOptionIndices
+                    .map(index => cleanOptions[index])
+                    .filter((item): item is string => !!item);
+
+                if (correctAnswers.length !== genQ.answer_keys.length) {
+                    console.warn("Mismatched answer keys and options from AI, skipping question:", genQ);
+                    return;
+                }
+
+                allQuestions.push({
+                    id: questionId++,
+                    question: genQ.question,
+                    options: cleanOptions,
+                    correctAnswer: genQ.isMultipleChoice ? correctAnswers : correctAnswers[0],
+                    isMultipleChoice: genQ.isMultipleChoice,
+                    difficulty: fullSettings.difficulty[Math.floor(Math.random() * fullSettings.difficulty.length)],
+                    explanation: genQ.explanation,
+                    topic: topic,
+                });
+            }
+          });
+        }
+      }
+
+      const questions = allQuestions.slice(0, fullSettings.numberOfQuestions);
       
       if (questions.length === 0) {
         setError("The AI failed to generate any questions for the selected topics. This can happen if the source material is insufficient. Please try again with different topics.");
@@ -271,6 +346,93 @@ const SetupPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const transformLoadedQuizData = (data: LoadedQuiz): { settings: QuizSettings, questions: Question[] } => {
+    if (!data.items || !data.answerKey) {
+        throw new Error("Invalid JSON format: 'items' and 'answerKey' properties are required.");
+    }
+
+    const answerMap = new Map<string, LoadedAnswer>();
+    data.answerKey.forEach(ans => answerMap.set(ans.id, ans));
+
+    const questions: Question[] = data.items.map((item, index) => {
+        const answer = answerMap.get(item.id);
+        if (!answer) {
+            throw new Error(`Answer not found for question ID: ${item.id}`);
+        }
+
+        const correctAnswers = answer.correctOptionIndices.map(i => item.options[i]);
+        if (correctAnswers.some(ans => ans === undefined)) {
+            throw new Error(`Invalid correctOptionIndices for question ID: ${item.id}`);
+        }
+
+        const isMultipleChoice = item.type === 'multi' || correctAnswers.length > 1;
+
+        const question: Question = {
+            id: index,
+            question: item.stem,
+            options: item.options,
+            correctAnswer: isMultipleChoice ? correctAnswers : correctAnswers[0],
+            isMultipleChoice: isMultipleChoice,
+            difficulty: 'Médio', // Default difficulty for loaded questions
+            explanation: answer.explanation,
+            topic: item.topics.join(', '),
+        };
+        return question;
+    });
+
+    const settings: QuizSettings = {
+        topics: Array.from(new Set(data.items.flatMap(item => item.topics))),
+        difficulty: ['Médio'],
+        numberOfQuestions: questions.length,
+        mode: 'practice', // Loaded quizzes default to practice mode
+    };
+
+    return { settings, questions };
+  };
+
+  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+    setNotification(null);
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const text = e.target?.result;
+            if (typeof text !== 'string') {
+                throw new Error('Could not read file content.');
+            }
+            const data = JSON.parse(text);
+
+            const { settings, questions } = transformLoadedQuizData(data);
+            
+            if (questions.length === 0) {
+                throw new Error("The selected file contains no valid questions.");
+            }
+
+            startQuiz(settings, questions);
+            navigate('/quiz');
+
+        } catch (err: any) {
+            setError(`Failed to load quiz from file: ${err.message}`);
+        } finally {
+            setLoading(false);
+            if (event.target) {
+                event.target.value = '';
+            }
+        }
+    };
+    reader.onerror = () => {
+        setError('Error reading the selected file.');
+        setLoading(false);
+    };
+    reader.readAsText(file);
+  };
+
 
   const ModeCard = ({ icon, title, description, value, children }: { icon: string, title: string, description: string, value: QuizMode, children?: React.ReactNode }) => (
     <div
@@ -291,6 +453,13 @@ const SetupPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in max-w-5xl mx-auto">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileSelected}
+        className="hidden"
+        accept=".json"
+      />
       <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2 text-center">AI Question Generator</h1>
       <p className="text-xl text-gray-500 mb-8 text-center">Customize your test to focus your studies.</p>
       
@@ -457,21 +626,65 @@ const SetupPage: React.FC = () => {
         </div>
       </Card>
 
+      <Card className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">5. Advanced Settings</h2>
+        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div>
+                <label htmlFor="align-switch" className="font-semibold text-slate-800">Align with Official Exam Style</label>
+                <p className="text-sm text-slate-500 mt-1">
+                    AI will generate questions mimicking various official formats (e.g., ordering, choose two/three, pairing).
+                </p>
+            </div>
+            <label htmlFor="align-switch" className="relative inline-flex items-center cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    id="align-switch" 
+                    className="sr-only peer"
+                    checked={alignWithExam}
+                    onChange={(e) => setAlignWithExam(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+            </label>
+        </div>
+      </Card>
+      
       <div className="mt-8 text-center">
         <Button onClick={handleStartQuiz} disabled={isLoading || leafTopicCount === 0} className="text-xl px-12 py-4 w-full md:w-auto">
-          {isLoading ? (
+          {isLoading && !error ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
               Generating Quiz...
             </div>
           ) : (
             <>
-              <i className="fa-solid fa-play mr-2"></i> Start Quiz
+              <i className="fa-solid fa-play mr-2"></i> Start AI Quiz
             </>
           )}
         </Button>
          <p className="text-xs text-slate-400 mt-4">Topics selected: {leafTopicCount}</p>
       </div>
+
+      <div className="my-8 flex items-center justify-center text-slate-500">
+          <hr className="w-full border-t border-slate-300" />
+          <span className="px-4 font-semibold whitespace-nowrap">OR</span>
+          <hr className="w-full border-t border-slate-300" />
+      </div>
+
+      <Card className="mb-8">
+        <div className="text-center">
+          <i className="fa-solid fa-file-import text-3xl mb-3 text-slate-500"></i>
+          <h2 className="text-2xl font-bold text-gray-700 mb-2">Load Quiz from File</h2>
+          <p className="text-slate-600 mb-6">Take a quiz using a pre-made JSON file.</p>
+          <Button onClick={() => fileInputRef.current?.click()} disabled={isLoading} className="bg-slate-700 hover:bg-slate-800 focus:ring-slate-500">
+             {isLoading && error ? (
+                <>Loading...</>
+            ) : (
+                <><i className="fa-solid fa-upload mr-2"></i> Select JSON File</>
+            )}
+          </Button>
+        </div>
+      </Card>
+      
     </div>
   );
 };

@@ -40,9 +40,12 @@ export const QuizProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const submitAnswer = (question: Question, userAnswer: string[], timeSpentOnQuestion: number) => {
     const correctAnswers = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+    const sortedCorrect = [...correctAnswers].sort();
+    const sortedUser = [...userAnswer].sort();
+    
     const isCorrect = 
-      correctAnswers.length === userAnswer.length &&
-      correctAnswers.every(ans => userAnswer.includes(ans));
+      sortedCorrect.length === sortedUser.length &&
+      sortedCorrect.every((value, index) => value === sortedUser[index]);
       
     setResults(prev => [...prev, { question, userAnswer, isCorrect, timeSpentOnQuestion }]);
   };
