@@ -23,7 +23,7 @@ const LastQuizStats: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
   let modeTitle = 'Practice';
   if (settings.mode === 'timed') modeTitle = 'Full Simulator';
   if (settings.mode === 'timed_half') modeTitle = '1/2 Simulator';
-  if (settings.mode === 'lightning') modeTitle = 'Lightning';
+  if (settings.mode === 'assessment') modeTitle = 'Assessment';
 
   return (
     <div className={`px-4 pt-4 pb-2 text-slate-300 ${!isOpen ? 'hidden' : ''}`}>

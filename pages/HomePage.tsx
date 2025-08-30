@@ -87,6 +87,8 @@ const SetupPage: React.FC = () => {
   const location = useLocation();
   const { startQuiz, isLoading, setLoading, setError, error } = useQuiz();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const assessmentFileInputRef = useRef<HTMLInputElement>(null);
+
 
   const [settings, setSettings] = useState<Pick<QuizSettings, 'topics' | 'difficulty' | 'numberOfQuestions'>>({
     topics: [curriculumTopics[0].subTopics![0].title],
@@ -95,15 +97,18 @@ const SetupPage: React.FC = () => {
   });
   const [mode, setMode] = useState<QuizMode>('practice');
   const [alignWithExam, setAlignWithExam] = useState(true);
-  const [lightningBaseTime, setLightningBaseTime] = useState(60);
-  const [lightningBonusTime, setLightningBonusTime] = useState(4);
+  const [assessmentFiles, setAssessmentFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
   
   const [activeTopicId, setActiveTopicId] = useState<string>(curriculumTopics[0].id);
 
   const isSimuladoMode = mode === 'timed' || mode === 'timed_half';
+  const isAssessmentMode = mode === 'assessment';
+  const isGeneratorMode = !isSimuladoMode && !isAssessmentMode;
+
   const SIMULADO_COMPLETO_QUESTIONS = 20;
   const HALF_SIMULADO_QUESTIONS = 50;
+  const ASSESSMENT_QUESTIONS = 40;
 
 
   const allTopicTitles = useMemo(() => {
@@ -132,8 +137,15 @@ const SetupPage: React.FC = () => {
         numberOfQuestions: numQuestions,
       };
     }
+    if (isAssessmentMode) {
+      return {
+        topics: [],
+        difficulty: ['Fácil', 'Médio', 'Difícil'] as Difficulty[],
+        numberOfQuestions: ASSESSMENT_QUESTIONS
+      };
+    }
     return settings;
-  }, [settings, isSimuladoMode, mode, allTopicTitles]);
+  }, [settings, isSimuladoMode, isAssessmentMode, mode, allTopicTitles]);
 
 
   const activeTopic = useMemo(() => 
@@ -141,20 +153,26 @@ const SetupPage: React.FC = () => {
     [activeTopicId]
   );
   
-  const [parentMap, childrenMap] = useMemo(() => {
+  const [parentMap, childrenMap, topicToPartMap] = useMemo(() => {
         const pMap = new Map<string, string | null>();
         const cMap = new Map<string, string[]>();
+        const partMap = new Map<string, string>();
         
-        const traverse = (topic: CourseTopic, parent: CourseTopic | null) => {
+        const traverse = (topic: CourseTopic, parent: CourseTopic | null, partId: string) => {
             pMap.set(topic.title, parent ? parent.title : null);
+            partMap.set(topic.title, partId);
+
             const childTitles = topic.subTopics ? topic.subTopics.map(t => t.title) : [];
             cMap.set(topic.title, childTitles);
+
             if (topic.subTopics) {
-                topic.subTopics.forEach(sub => traverse(sub, topic));
+                topic.subTopics.forEach(sub => traverse(sub, topic, partId));
             }
         };
-        curriculumTopics.forEach(t => traverse(t, null));
-        return [pMap, cMap];
+        curriculumTopics.forEach(part => {
+          part.subTopics?.forEach(topic => traverse(topic, null, part.id))
+        });
+        return [pMap, cMap, partMap];
     }, []);
 
     const selectedTopics = useMemo(() => new Set(effectiveSettings.topics), [effectiveSettings.topics]);
@@ -195,7 +213,7 @@ const SetupPage: React.FC = () => {
     }, [location.pathname]);
 
     const handleTopicChange = useCallback((topic: CourseTopic, checked: boolean) => {
-        if (isSimuladoMode) return; // Safeguard
+        if (!isGeneratorMode) return;
         setSettings(prev => {
             const newSelected = new Set(prev.topics);
 
@@ -232,10 +250,10 @@ const SetupPage: React.FC = () => {
 
             return { ...prev, topics: newTopicsArray };
         });
-    }, [parentMap, childrenMap, isSimuladoMode]);
+    }, [parentMap, childrenMap, isGeneratorMode]);
     
   const handleDifficultyChange = (d: Difficulty, checked: boolean) => {
-    if (isSimuladoMode) return;
+    if (!isGeneratorMode) return;
     setSettings(prev => {
         const currentDifficulties = prev.difficulty;
         let newDifficulties;
@@ -252,7 +270,136 @@ const SetupPage: React.FC = () => {
     });
   };
 
+  const transformLoadedQuizData = (data: LoadedQuiz, startIndex: number = 0): Question[] => {
+    if (!data.items || !data.answerKey) {
+        throw new Error("Invalid JSON format: 'items' and 'answerKey' properties are required.");
+    }
+
+    const answerMap = new Map<string, LoadedAnswer>();
+    data.answerKey.forEach(ans => answerMap.set(ans.id, ans));
+
+    const questions: Question[] = data.items.map((item, index) => {
+        const answer = answerMap.get(item.id);
+        if (!answer) {
+            console.warn(`Answer not found for question ID: ${item.id}, skipping.`);
+            return null;
+        }
+
+        const correctAnswers = answer.correctOptionIndices.map(i => item.options[i]);
+        if (correctAnswers.some(ans => ans === undefined)) {
+            console.warn(`Invalid correctOptionIndices for question ID: ${item.id}, skipping.`);
+            return null;
+        }
+
+        const isMultipleChoice = item.type === 'multi' || correctAnswers.length > 1;
+
+        const question: Question = {
+            id: startIndex + index,
+            question: item.stem,
+            options: item.options,
+            correctAnswer: isMultipleChoice ? correctAnswers : correctAnswers[0],
+            isMultipleChoice: isMultipleChoice,
+            difficulty: 'Médio', // Default difficulty for loaded questions
+            explanation: answer.explanation,
+            topic: item.topics[0] || 'Uncategorized',
+        };
+        return question;
+    }).filter((q): q is Question => q !== null);
+
+    return questions;
+  };
+
+  const parseAndTransformQuizData = (jsonString: string, questionIdCounter: number): Question[] => {
+      let data = JSON.parse(jsonString);
+      // Handle double-stringified JSON
+      if (typeof data === 'string') {
+          data = JSON.parse(data);
+      }
+      return transformLoadedQuizData(data, questionIdCounter);
+  };
+
+  const handleStartAssessmentQuiz = async () => {
+    if (assessmentFiles.length === 0) {
+        setError("Please upload at least one question bank file for the assessment.");
+        return;
+    }
+    setLoading(true);
+    setError(null);
+    setNotification(null);
+
+    try {
+        // 1. Read and parse all files
+        const fileContents = await Promise.all(assessmentFiles.map(file => file.text()));
+        let allQuestions: Question[] = [];
+        let questionIdCounter = 0;
+        fileContents.forEach(content => {
+            const questionsFromFile = parseAndTransformQuizData(content, questionIdCounter);
+            allQuestions.push(...questionsFromFile);
+            questionIdCounter += questionsFromFile.length;
+        });
+
+        if (allQuestions.length < ASSESSMENT_QUESTIONS) {
+          throw new Error(`Not enough questions. Uploaded files contain only ${allQuestions.length} questions, but ${ASSESSMENT_QUESTIONS} are needed for a full assessment.`);
+        }
+
+        // 2. Categorize questions by Part
+        const categorizedQuestions: { [key: string]: Question[] } = {
+            'part-i': [], 'part-ii': [], 'part-iii': [], 'part-iv': []
+        };
+        allQuestions.forEach(q => {
+            const partId = topicToPartMap.get(q.topic);
+            if (partId && categorizedQuestions[partId]) {
+                categorizedQuestions[partId].push(q);
+            }
+        });
+
+        // 3. Select questions based on distribution
+        const distribution = {
+            'part-i': 0.15, // 6 questions
+            'part-ii': 0.35, // 14 questions
+            'part-iii': 0.15, // 6 questions
+            'part-iv': 0.35, // 14 questions
+        };
+        let selectedQuestions: Question[] = [];
+        Object.entries(distribution).forEach(([partId, percentage]) => {
+            const count = Math.round(ASSESSMENT_QUESTIONS * percentage);
+            const pool = categorizedQuestions[partId];
+            if (pool.length < count) {
+                console.warn(`Not enough questions for ${partId}. Have ${pool.length}, need ${count}. Using all available.`);
+                selectedQuestions.push(...pool);
+            } else {
+                 const shuffled = pool.sort(() => 0.5 - Math.random());
+                 selectedQuestions.push(...shuffled.slice(0, count));
+            }
+        });
+        
+        // Ensure exact count
+        selectedQuestions = selectedQuestions.sort(() => 0.5 - Math.random()).slice(0, ASSESSMENT_QUESTIONS);
+
+        // 4. Start quiz
+        const finalSettings: QuizSettings = {
+            ...effectiveSettings,
+            mode: 'assessment',
+            topics: ['Assessment Mix'],
+        };
+
+        startQuiz(finalSettings, selectedQuestions.map((q, i) => ({ ...q, id: i })));
+        navigate('/quiz');
+
+    } catch (err: any) {
+        setError(err.message || 'An unknown error occurred during assessment setup.');
+    } finally {
+        setLoading(false);
+    }
+  };
+
+
   const handleStartQuiz = async () => {
+    if (mode === 'assessment') {
+        handleStartAssessmentQuiz();
+        return;
+    }
+
     setLoading(true);
     setError(null);
     setNotification(null);
@@ -270,11 +417,6 @@ const SetupPage: React.FC = () => {
         mode,
         topics: finalTopics,
       };
-      
-      if (mode === 'lightning') {
-        fullSettings.lightningBaseTime = lightningBaseTime;
-        fullSettings.lightningBonusTime = lightningBonusTime;
-      }
       
       const allQuestions: Question[] = [];
       let questionId = 0;
@@ -347,90 +489,82 @@ const SetupPage: React.FC = () => {
     }
   };
 
-  const transformLoadedQuizData = (data: LoadedQuiz): { settings: QuizSettings, questions: Question[] } => {
-    if (!data.items || !data.answerKey) {
-        throw new Error("Invalid JSON format: 'items' and 'answerKey' properties are required.");
-    }
-
-    const answerMap = new Map<string, LoadedAnswer>();
-    data.answerKey.forEach(ans => answerMap.set(ans.id, ans));
-
-    const questions: Question[] = data.items.map((item, index) => {
-        const answer = answerMap.get(item.id);
-        if (!answer) {
-            throw new Error(`Answer not found for question ID: ${item.id}`);
-        }
-
-        const correctAnswers = answer.correctOptionIndices.map(i => item.options[i]);
-        if (correctAnswers.some(ans => ans === undefined)) {
-            throw new Error(`Invalid correctOptionIndices for question ID: ${item.id}`);
-        }
-
-        const isMultipleChoice = item.type === 'multi' || correctAnswers.length > 1;
-
-        const question: Question = {
-            id: index,
-            question: item.stem,
-            options: item.options,
-            correctAnswer: isMultipleChoice ? correctAnswers : correctAnswers[0],
-            isMultipleChoice: isMultipleChoice,
-            difficulty: 'Médio', // Default difficulty for loaded questions
-            explanation: answer.explanation,
-            topic: item.topics.join(', '),
-        };
-        return question;
-    });
-
-    const settings: QuizSettings = {
-        topics: Array.from(new Set(data.items.flatMap(item => item.topics))),
-        difficulty: ['Médio'],
-        numberOfQuestions: questions.length,
-        mode: 'practice', // Loaded quizzes default to practice mode
-    };
-
-    return { settings, questions };
-  };
 
   const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     setLoading(true);
     setError(null);
     setNotification(null);
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        try {
-            const text = e.target?.result;
-            if (typeof text !== 'string') {
-                throw new Error('Could not read file content.');
-            }
-            const data = JSON.parse(text);
+    const fileReadPromises = Array.from(files).map(file => {
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target?.result;
+                if (typeof text === 'string') {
+                    resolve(text);
+                } else {
+                    reject(new Error(`Could not read file content from ${file.name}.`));
+                }
+            };
+            reader.onerror = () => {
+                reject(new Error(`Error reading file ${file.name}.`));
+            };
+            reader.readAsText(file);
+        });
+    });
 
-            const { settings, questions } = transformLoadedQuizData(data);
-            
-            if (questions.length === 0) {
-                throw new Error("The selected file contains no valid questions.");
+    Promise.all(fileReadPromises)
+        .then(jsonStrings => {
+            let allQuestions: Question[] = [];
+            const allTopics = new Set<string>();
+            let questionIdCounter = 0;
+
+            jsonStrings.forEach((jsonString, index) => {
+                try {
+                    const questions = parseAndTransformQuizData(jsonString, questionIdCounter);
+                    
+                    questions.forEach(q => allTopics.add(q.topic));
+                    
+                    allQuestions.push(...questions);
+                    questionIdCounter += questions.length;
+
+                } catch(e: any) {
+                    throw new Error(`Error processing file #${index + 1}: ${e.message}`);
+                }
+            });
+
+            if (allQuestions.length === 0) {
+                throw new Error("The selected file(s) contain no valid questions or could not be parsed.");
             }
 
-            startQuiz(settings, questions);
+            const combinedSettings: QuizSettings = {
+                topics: Array.from(allTopics),
+                difficulty: ['Médio'],
+                numberOfQuestions: allQuestions.length,
+                mode: 'practice',
+            };
+
+            startQuiz(combinedSettings, allQuestions);
             navigate('/quiz');
 
-        } catch (err: any) {
-            setError(`Failed to load quiz from file: ${err.message}`);
-        } finally {
+        }).catch((err: any) => {
+            setError(`Failed to load quiz from file(s): ${err.message}`);
+        }).finally(() => {
             setLoading(false);
             if (event.target) {
                 event.target.value = '';
             }
-        }
-    };
-    reader.onerror = () => {
-        setError('Error reading the selected file.');
-        setLoading(false);
-    };
-    reader.readAsText(file);
+        });
+  };
+  
+  const handleAssessmentFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+        setAssessmentFiles(Array.from(files));
+    }
   };
 
 
@@ -451,6 +585,8 @@ const SetupPage: React.FC = () => {
     return effectiveSettings.topics.filter(t => (childrenMap.get(t) || []).length === 0).length;
   }, [effectiveSettings.topics, childrenMap]);
 
+  const startButtonDisabled = isLoading || (isGeneratorMode && leafTopicCount === 0) || (isAssessmentMode && assessmentFiles.length === 0);
+
   return (
     <div className="animate-fade-in max-w-5xl mx-auto">
       <input
@@ -459,6 +595,15 @@ const SetupPage: React.FC = () => {
         onChange={handleFileSelected}
         className="hidden"
         accept=".json"
+        multiple
+      />
+      <input
+          type="file"
+          ref={assessmentFileInputRef}
+          onChange={handleAssessmentFileChange}
+          className="hidden"
+          accept=".json"
+          multiple
       />
       <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2 text-center">AI Question Generator</h1>
       <p className="text-xl text-gray-500 mb-8 text-center">Customize your test to focus your studies.</p>
@@ -475,9 +620,9 @@ const SetupPage: React.FC = () => {
         </div>
       )}
 
-      <Card className={`mb-8 ${isSimuladoMode ? 'bg-slate-50' : ''}`}>
+      <Card className={`mb-8 ${!isGeneratorMode ? 'bg-slate-50' : ''}`}>
         <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">1. Choose Topics</h2>
-        {isSimuladoMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Simulator mode automatically selects all topics.</div>}
+        {!isGeneratorMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Topics are selected automatically for this mode.</div>}
         
         {/* Mobile Dropdown */}
         <div className="md:hidden">
@@ -487,7 +632,7 @@ const SetupPage: React.FC = () => {
             value={activeTopicId}
             onChange={(e) => setActiveTopicId(e.target.value)}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
-            disabled={isSimuladoMode}
+            disabled={!isGeneratorMode}
           >
             {curriculumTopics.map(topic => (
               <option key={topic.id} value={topic.id}>{topic.title}</option>
@@ -505,9 +650,9 @@ const SetupPage: React.FC = () => {
                   key={topic.id}
                   type="button"
                   onClick={() => setActiveTopicId(topic.id)}
-                  className={`w-full text-left px-3 py-2 rounded-md transition-colors text-sm ${activeTopicId === topic.id ? 'bg-red-100 text-red-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'} ${isSimuladoMode ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  className={`w-full text-left px-3 py-2 rounded-md transition-colors text-sm ${activeTopicId === topic.id ? 'bg-red-100 text-red-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'} ${!isGeneratorMode ? 'opacity-60 cursor-not-allowed' : ''}`}
                   aria-current={activeTopicId === topic.id}
-                  disabled={isSimuladoMode}
+                  disabled={!isGeneratorMode}
                 >
                   {topic.title}
                 </button>
@@ -519,13 +664,13 @@ const SetupPage: React.FC = () => {
           <div className="md:col-span-2 mt-4 md:mt-0">
             {activeTopic && (
               <div>
-                <label className={`flex items-center p-2 rounded-md transition-all ${isSimuladoMode ? 'cursor-not-allowed bg-slate-200' : 'hover:bg-slate-100 cursor-pointer'} bg-slate-50 font-semibold text-slate-800`}>
+                <label className={`flex items-center p-2 rounded-md transition-all ${!isGeneratorMode ? 'cursor-not-allowed bg-slate-200' : 'hover:bg-slate-100 cursor-pointer'} bg-slate-50 font-semibold text-slate-800`}>
                   <input
                     type="checkbox"
                     checked={selectedTopics.has(activeTopic.title)}
                     onChange={e => handleTopicChange(activeTopic, e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
-                    disabled={isSimuladoMode}
+                    disabled={!isGeneratorMode}
                   />
                   <span className="ml-3">Select/Deselect All</span>
                 </label>
@@ -537,7 +682,7 @@ const SetupPage: React.FC = () => {
                         topic={subTopic}
                         selectedTopics={selectedTopics}
                         onTopicChange={handleTopicChange}
-                        disabled={isSimuladoMode}
+                        disabled={!isGeneratorMode}
                       />
                     ))
                   ) : (
@@ -551,12 +696,12 @@ const SetupPage: React.FC = () => {
       </Card>
       
       <div className="grid md:grid-cols-2 gap-8 mb-8">
-        <Card className={`${isSimuladoMode ? 'bg-slate-50' : ''}`}>
+        <Card className={`${!isGeneratorMode ? 'bg-slate-50' : ''}`}>
           <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">2. Set Difficulty</h2>
-          {isSimuladoMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Simulator mode uses a mix of difficulties to simulate the real exam.</div>}
+          {!isGeneratorMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Simulator & Assessment modes use a mix of difficulties.</div>}
           <div className="flex flex-col space-y-3">
             {(['Fácil', 'Médio', 'Difícil'] as Difficulty[]).map(d => (
-              <label key={d} className={`flex items-center p-3 rounded-lg border ${isSimuladoMode ? 'cursor-not-allowed bg-slate-200' : 'cursor-pointer'} ${effectiveSettings.difficulty.includes(d) ? 'bg-red-50 border-red-400' : 'bg-white'}`}>
+              <label key={d} className={`flex items-center p-3 rounded-lg border ${!isGeneratorMode ? 'cursor-not-allowed bg-slate-200' : 'cursor-pointer'} ${effectiveSettings.difficulty.includes(d) ? 'bg-red-50 border-red-400' : 'bg-white'}`}>
                 <input
                   type="checkbox"
                   name="difficulty"
@@ -564,7 +709,7 @@ const SetupPage: React.FC = () => {
                   checked={effectiveSettings.difficulty.includes(d)}
                   onChange={(e) => handleDifficultyChange(d, e.target.checked)}
                   className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                  disabled={isSimuladoMode}
+                  disabled={!isGeneratorMode}
                 />
                 <span className="ml-3 text-slate-700 font-medium">{d}</span>
               </label>
@@ -573,7 +718,7 @@ const SetupPage: React.FC = () => {
         </Card>
         <Card>
             <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">3. Number of Questions</h2>
-            {isSimuladoMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md -mt-2 mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Fixed for the selected mode.</div>}
+            {!isGeneratorMode && <div className="text-sm text-red-700 bg-red-50 p-3 rounded-md -mt-2 mb-4"><i className="fa-solid fa-info-circle mr-2"></i>Fixed for the selected mode.</div>}
             <div className="flex flex-col items-center justify-center h-full">
                 <span className="text-6xl font-bold text-red-600 mb-4">{effectiveSettings.numberOfQuestions}</span>
                 <input
@@ -581,9 +726,9 @@ const SetupPage: React.FC = () => {
                 min="1"
                 max="50"
                 value={effectiveSettings.numberOfQuestions}
-                onChange={(e) => !isSimuladoMode && setSettings(prev => ({...prev, numberOfQuestions: parseInt(e.target.value, 10)}))}
+                onChange={(e) => isGeneratorMode && setSettings(prev => ({...prev, numberOfQuestions: parseInt(e.target.value, 10)}))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSimuladoMode}
+                disabled={!isGeneratorMode}
                 />
             </div>
         </Card>
@@ -593,32 +738,18 @@ const SetupPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-700 mb-4 border-b pb-3">4. Choose Game Mode</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mt-4">
           <ModeCard icon="fa-graduation-cap" title="Practice" description="No time limit, learn and review at your own pace." value="practice" />
-          <ModeCard icon="fa-bolt-lightning" title="Lightning Quiz" description="Total time with a bonus per answer. Agility is key!" value="lightning">
-            {mode === 'lightning' && (
-              <div className="mt-4 border-t pt-4 space-y-3 animate-fade-in text-left">
-                <div>
-                  <label htmlFor="baseTime" className="block text-sm font-medium text-gray-700">Base Time (seconds)</label>
-                  <input 
-                    type="number"
-                    id="baseTime"
-                    value={lightningBaseTime}
-                    onChange={(e) => setLightningBaseTime(Math.max(10, parseInt(e.target.value, 10) || 10))}
-                    onClick={(e) => e.stopPropagation()}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="bonusTime" className="block text-sm font-medium text-gray-700">Bonus per Answer (seconds)</label>
-                  <input 
-                    type="number"
-                    id="bonusTime"
-                    value={lightningBonusTime}
-                    onChange={(e) => setLightningBonusTime(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    onClick={(e) => e.stopPropagation()}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-              </div>
+          <ModeCard icon="fa-clipboard-question" title="Assessment" description="Upload your question banks for an initial knowledge evaluation based on exam weights." value="assessment">
+            {mode === 'assessment' && (
+               <div className="mt-4 border-t pt-4 space-y-3 animate-fade-in text-left">
+                  <Button onClick={() => assessmentFileInputRef.current?.click()} className="w-full bg-slate-700 hover:bg-slate-800 focus:ring-slate-500 text-sm">
+                      <i className="fa-solid fa-upload mr-2"></i> Upload Question Files
+                  </Button>
+                  {assessmentFiles.length > 0 && (
+                      <ul className="text-xs text-slate-500 space-y-1">
+                          {assessmentFiles.map(f => <li key={f.name} className="truncate">✓ {f.name}</li>)}
+                      </ul>
+                  )}
+               </div>
             )}
           </ModeCard>
           <ModeCard icon="fa-file-alt" title="Full Simulator" description="A 20-question version for a quick test of the exam format." value="timed" />
@@ -649,11 +780,11 @@ const SetupPage: React.FC = () => {
       </Card>
       
       <div className="mt-8 text-center">
-        <Button onClick={handleStartQuiz} disabled={isLoading || leafTopicCount === 0} className="text-xl px-12 py-4 w-full md:w-auto">
+        <Button onClick={handleStartQuiz} disabled={startButtonDisabled} className="text-xl px-12 py-4 w-full md:w-auto">
           {isLoading && !error ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-              Generating Quiz...
+              {isAssessmentMode ? 'Building Assessment...' : 'Generating Quiz...'}
             </div>
           ) : (
             <>
@@ -661,7 +792,10 @@ const SetupPage: React.FC = () => {
             </>
           )}
         </Button>
-         <p className="text-xs text-slate-400 mt-4">Topics selected: {leafTopicCount}</p>
+         <p className="text-xs text-slate-400 mt-4">
+            {isGeneratorMode && `Topics selected: ${leafTopicCount}`}
+            {isAssessmentMode && `Files uploaded: ${assessmentFiles.length}`}
+         </p>
       </div>
 
       <div className="my-8 flex items-center justify-center text-slate-500">
@@ -674,12 +808,12 @@ const SetupPage: React.FC = () => {
         <div className="text-center">
           <i className="fa-solid fa-file-import text-3xl mb-3 text-slate-500"></i>
           <h2 className="text-2xl font-bold text-gray-700 mb-2">Load Quiz from File</h2>
-          <p className="text-slate-600 mb-6">Take a quiz using a pre-made JSON file.</p>
+          <p className="text-slate-600 mb-6">Take a quiz using one or more pre-made JSON files.</p>
           <Button onClick={() => fileInputRef.current?.click()} disabled={isLoading} className="bg-slate-700 hover:bg-slate-800 focus:ring-slate-500">
              {isLoading && error ? (
                 <>Loading...</>
             ) : (
-                <><i className="fa-solid fa-upload mr-2"></i> Select JSON File</>
+                <><i className="fa-solid fa-upload mr-2"></i> Select JSON File(s)</>
             )}
           </Button>
         </div>

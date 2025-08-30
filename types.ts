@@ -19,7 +19,7 @@ export interface CourseTopic {
   subTopics?: CourseTopic[];
 }
 
-export type QuizMode = 'practice' | 'timed' | 'timed_half' | 'lightning';
+export type QuizMode = 'practice' | 'timed' | 'timed_half' | 'assessment';
 
 export type Difficulty = 'Fácil' | 'Médio' | 'Difícil';
 
@@ -28,8 +28,6 @@ export interface QuizSettings {
     difficulty: Difficulty[];
     numberOfQuestions: number;
     mode: QuizMode;
-    lightningBaseTime?: number; // Time in seconds
-    lightningBonusTime?: number; // Time in seconds
 }
 
 export interface QuizResult {

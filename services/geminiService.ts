@@ -53,6 +53,40 @@ const RETRIEVER_TOKEN =
 const GEMINI_API_KEY =
   (import.meta as any).env?.VITE_GEMINI_API_KEY ?? (window as any).__GEMINI_API_KEY;
 
+// ---------- Helper: Robust JSON Parser ----------
+function robustJsonParse(jsonString: string): any {
+    // Step 1: Remove citation markers like [cite_start:1]
+    let text = jsonString.replace(/\[\s*cite_start:[^\]]*\]|\[\s*cite_end:[^\]]*\]/g, '').trim();
+
+    // Step 2: Remove markdown code fences if they exist
+    const markdownMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (markdownMatch) {
+        text = markdownMatch[1];
+    }
+
+    // Step 3: Try parsing the cleaned text directly
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        // Step 4: If direct parsing fails, find the first '{' and the last '}'
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+            const potentialJson = text.substring(firstBrace, lastBrace + 1);
+            try {
+                return JSON.parse(potentialJson);
+            } catch (finalError) {
+                const errorMessage = `Failed to parse JSON even after extraction. The AI's response was malformed. Snippet: "${jsonString.substring(0, 100)}..."`;
+                throw new Error(errorMessage);
+            }
+        }
+    }
+    
+    const errorMessage = `Could not find a valid JSON object in the AI's response. Snippet: "${jsonString.substring(0, 100)}..."`;
+    throw new Error(errorMessage);
+}
+
+
 // ---------- 1) Retriever: chama o Worker e obtém snippets ----------
 export async function searchChunks(params: {
   topic: string;
@@ -238,7 +272,8 @@ function validateSources(
   }
 
   if (!Array.isArray(out.answer_keys) || out.answer_keys.length === 0) return { ok: false, reason: "Answer keys must be a non-empty array." };
-  if (!Array.isArray(out.options) || out.options.length < 4) return { ok: false, reason: "Must provide at least 4 options." };
+  if (!Array.isArray(out.options) || out.options.length < 2) return { ok: false, reason: "Must provide at least 2 options." };
+
 
   for (const key of out.answer_keys) {
       if (!/^[A-F]$/.test(key)) return { ok: false, reason: `Invalid answer key format: ${key}`};
@@ -284,12 +319,13 @@ export async function generateQuestionFromContext(input: GenerateInput): Promise
 
   let parsed: GeneratedQuestion | null = null;
   try {
-    parsed = JSON.parse(raw) as GeneratedQuestion;
-  } catch {
-    const m = raw.match(/\{[\s\S]*\}$/);
-    if (m) parsed = JSON.parse(m[0]) as GeneratedQuestion;
+    parsed = robustJsonParse(raw) as GeneratedQuestion;
+  } catch (err: any) {
+    return { ok: false, reason: err.message, used };
   }
+  
   if (!parsed) return { ok: false, reason: "Model did not return valid JSON.", used };
+
 
   const allText = `${parsed.question} ${parsed.explanation}`.toLowerCase();
   if (allText.includes("insufficient data in context")) {
@@ -360,11 +396,11 @@ export async function generateQuestions(
 
     let parsed: GeneratedQuestion | null = null;
     try {
-      parsed = JSON.parse(raw) as GeneratedQuestion;
-    } catch {
-      const m = raw.match(/\{[\s\S]*\}$/);
-      if (m) parsed = JSON.parse(m[0]) as GeneratedQuestion;
+        parsed = robustJsonParse(raw) as GeneratedQuestion;
+    } catch (err: any) {
+        return { ok: false, reason: err.message, used };
     }
+    
     if (!parsed) return { ok: false, reason: "Model did not return valid JSON.", used };
 
     const allText = `${parsed.question} ${parsed.explanation}`.toLowerCase();

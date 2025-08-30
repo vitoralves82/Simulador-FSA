@@ -80,7 +80,6 @@ const QuizEnginePage: React.FC = () => {
     useEffect(() => {
         if (!settings || questions.length === 0) return;
         if (isTimedMode) setTimeLeft(questions.length * 90);
-        else if (settings.mode === 'lightning') setTimeLeft(settings.lightningBaseTime || 60);
         else setTimeLeft(null);
     }, [settings, questions, isTimedMode]);
 
@@ -124,14 +123,10 @@ const QuizEnginePage: React.FC = () => {
         const timeSpent = (Date.now() - questionStartTime) / 1000;
         submitAnswer(questions[currentQuestionIndex], selectedAnswers, timeSpent);
         
-        if (settings?.mode === 'lightning' && timeLeft !== null) {
-            setTimeLeft(prev => (prev || 0) + (settings.lightningBonusTime || 4));
-        }
-        
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
         } else {
-            if (settings?.mode === 'practice') endQuiz(timeElapsed);
+            if (settings?.mode === 'practice' || settings?.mode === 'assessment') endQuiz(timeElapsed);
             else if (isTimedMode) endQuiz((questions.length * 90) - (timeLeft ?? 0));
             else endQuiz();
             navigate('/results');
@@ -173,7 +168,7 @@ const QuizEnginePage: React.FC = () => {
     let modeTitle = 'Practice Mode';
     if(settings.mode === 'timed') modeTitle = 'Full Simulator';
     if(settings.mode === 'timed_half') modeTitle = '1/2 Simulator';
-    if(settings.mode === 'lightning') modeTitle = 'Lightning Quiz';
+    if(settings.mode === 'assessment') modeTitle = 'Assessment';
     const isReviewed = reviewedQuestions.has(question.id);
 
     return (
@@ -202,7 +197,7 @@ const QuizEnginePage: React.FC = () => {
                             <div className="flex justify-between items-center mb-2">
                                 <h1 className="text-xl font-bold text-red-600 capitalize">{modeTitle}</h1>
                                 <div className="flex items-center space-x-4">
-                                    {settings.mode === 'practice' ? (
+                                    {(settings.mode === 'practice' || settings.mode === 'assessment') ? (
                                         <div className={`text-xl font-bold transition-colors duration-300 ${timeOnCurrentQuestion > 55 ? 'text-red-500' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeOnCurrentQuestion)}</div>
                                     ) : (
                                         <div className={`text-xl font-bold ${timeLeft !== null && timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-600'}`}><i className="fa-regular fa-clock mr-2"></i>{formatTime(timeLeft)}</div>
@@ -263,7 +258,7 @@ const QuizEnginePage: React.FC = () => {
                                 <i className={`fa-solid fa-star mr-2 ${isReviewed ? 'text-yellow-500' : 'text-slate-400'}`}></i>
                                 {isReviewed ? 'Marked for Review' : 'Mark for Review'}
                             </button>
-                            {settings.mode === 'practice' ? (
+                            {(settings.mode === 'practice' || settings.mode === 'assessment') ? (
                                 showFeedback ? (
                                      <Button onClick={handleNext}>Next Question</Button>
                                 ) : (
