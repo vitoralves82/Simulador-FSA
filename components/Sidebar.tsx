@@ -92,6 +92,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setOpen }) => {
             <i className="fa-solid fa-vial w-6 text-center text-lg text-lime-300"></i>
             {isOpen && <span className="mx-4">Gerador Rápido</span>}
           </NavLink>
+          <NavLink to="/history" className={({ isActive }) => `${baseLinkClasses} ${isActive ? activeLinkClasses : ''} ${!isOpen ? 'justify-center' : ''}`} title={!isOpen ? 'Histórico de Provas' : undefined}>
+            <i className="fa-solid fa-history w-6 text-center text-lg text-purple-300"></i>
+            {isOpen && <span className="mx-4">Histórico de Provas</span>}
+          </NavLink>
         </nav>
       </div>
        <div className="p-2 border-t border-slate-700">

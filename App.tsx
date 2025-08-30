@@ -8,6 +8,7 @@ import ResultsPage from './pages/FinalExamPage'; // Renamed component
 import SessionPage from './pages/SessionPage';
 import KnowledgeBasePage from './pages/KnowledgeBasePage';
 import QuestionGeneratorPage from './pages/QuestionGeneratorPage';
+import QuizHistoryPage from './pages/QuizHistoryPage';
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
           <Route path="/exam" element={<SetupPage />} />
           <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
           <Route path="/gerador-rapido" element={<QuestionGeneratorPage />} />
+          <Route path="/history" element={<QuizHistoryPage />} />
           <Route path="/quiz" element={<QuizEnginePage />} />
           <Route path="/results" element={<ResultsPage />} />
         </Routes>

@@ -278,8 +278,8 @@ const ResultsPage: React.FC = () => {
                 {isAnalysisLoading && <div className="flex justify-center p-4"><Spinner /></div>}
                 {analysisError && <p className="text-red-500 bg-red-50 p-3 rounded-md">{analysisError}</p>}
                 {analysis && (
-                    <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">{analysis}</pre>
+                    <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200 prose prose-sm max-w-none">
+                        <pre className="whitespace-pre-wrap font-sans text-slate-700">{analysis}</pre>
                     </div>
                 )}
             </Card>

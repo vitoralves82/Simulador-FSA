@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { QuizSettings, Question, QuizResult } from '../types';
+import { useQuizHistory } from '../hooks/useQuizHistory';
 
 interface QuizContextType {
   settings: QuizSettings | null;
@@ -28,6 +29,7 @@ export const QuizProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [error, setErrorState] = useState<string | null>(null);
   const [timeTaken, setTimeTaken] = useState<number | null>(null);
   const [reviewedQuestions, setReviewedQuestions] = useState(new Set<number>());
+  const { saveQuizToHistory } = useQuizHistory();
 
   const startQuiz = (newSettings: QuizSettings, newQuestions: Question[]) => {
     setSettings(newSettings);
@@ -52,6 +54,14 @@ export const QuizProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const endQuiz = (timeInSeconds?: number) => {
     setTimeTaken(timeInSeconds ?? null);
+    if (settings && results.length > 0) {
+        saveQuizToHistory({
+            settings,
+            results,
+            date: new Date().toISOString(),
+            timeTaken: timeInSeconds ?? null,
+        });
+    }
   };
 
   const resetQuiz = () => {

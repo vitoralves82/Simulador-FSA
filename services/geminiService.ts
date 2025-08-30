@@ -311,7 +311,7 @@ A student has just completed a quiz. Analyze their performance based on the data
 ${JSON.stringify(summary, null, 2)}
 
 **Instructions:**
-Generate a report in markdown format. Use headings for each section.
+Generate a report in **Markdown format**. Use headings for each section.
 
 **Overall Performance Summary**
 - Briefly comment on the student's overall score. Be encouraging and constructive.
