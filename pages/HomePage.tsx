@@ -157,10 +157,12 @@ const SetupPage: React.FC = () => {
         const pMap = new Map<string, string | null>();
         const cMap = new Map<string, string[]>();
         const partMap = new Map<string, string>();
-        
+
         const traverse = (topic: CourseTopic, parent: CourseTopic | null, partId: string) => {
             pMap.set(topic.title, parent ? parent.title : null);
             partMap.set(topic.title, partId);
+            // also map by topic id for lookups using ids from question files
+            partMap.set(topic.id, partId);
 
             const childTitles = topic.subTopics ? topic.subTopics.map(t => t.title) : [];
             cMap.set(topic.title, childTitles);
