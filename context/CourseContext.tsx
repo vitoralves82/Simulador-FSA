@@ -55,9 +55,13 @@ export const QuizProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const endQuiz = (timeInSeconds?: number) => {
     setTimeTaken(timeInSeconds ?? null);
     if (settings && results.length > 0) {
+        // Create a "lean" version of the results for history to avoid storage issues.
+        // We only need `isCorrect` to calculate the score on the history page.
+        const leanResults = results.map(r => ({ isCorrect: r.isCorrect }));
+
         saveQuizToHistory({
             settings,
-            results,
+            results: leanResults,
             date: new Date().toISOString(),
             timeTaken: timeInSeconds ?? null,
         });

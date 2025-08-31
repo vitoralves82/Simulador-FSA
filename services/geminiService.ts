@@ -93,27 +93,34 @@ ${exampleQuestions.map(q => JSON.stringify({ question: q.question, options: q.op
 
   if (alignWithExam) {
       return `
-You are an expert exam item writer for the IFRS Foundation's FSA Level I exam.
-Your task is to create ONE exam-style question based on your knowledge of the topic: "${topic}".
+You are an expert exam item writer for the IFRS Foundation's FSA Level I exam, tasked with creating a difficult, exam-style question based on your deep knowledge of the topic: "${topic}".
 
 ${examplePrompt}
 
 Output English only.
 
-**FSA Level I Question Styles:**
-You MUST generate a question that fits one of the following formats, chosen based on what the context best supports:
-1.  **Single-Concept (Single-Choice):** A direct question testing a key definition or concept. (e.g., "What is the primary challenge of X?") Always use 4 options (A-D).
-2.  **Multiple-Answer (Choose Two/Three):** A question that requires selecting two or three correct statements from a list. The stem must clearly state "(Choose two)" or "(Choose three)". For "Choose two", provide 4-5 options. For "Choose three", provide 5-6 options (A-F).
-3.  **Sequence/Ordering:** Present 4 numbered events or stages. The options (A-D) must be different permutations of these numbers (e.g., "3, 1, 2, 4"). The stem will ask to select the correct chronological or logical order.
-4.  **Pairing/Matching:** Ask the user to choose the pairing that correctly matches a data type with its relevance to a financial driver (e.g., DCF analysis). Present 4 options (A-D), each containing a pair.
-5.  **Spectrum/Classification:** Ask the user to identify which item fits best at a certain point on a spectrum (e.g., farthest on the 'value' end of investing approaches). Present 4 options (A-D).
-6.  **Inclusion/Exclusion Criteria:** Ask which two statements, if true, provide evidence that a topic fails to meet criteria for inclusion in a standard. This is typically a "Choose two" format.
+**General Instructions:**
+- **Varied Text Length:** The FSA exam contains a mix of question lengths. Approximately 60% of questions are concise and can be answered in under a minute. The other 40% are more complex, featuring mini-scenarios and more detailed options. When generating a question, decide whether it should be a shorter, concept-check question or a longer, scenario-based question, and write the stem and options accordingly.
+- **Plausible Distractors:** Regardless of length, craft incorrect options (distractors) to be highly plausible. They must be similar in length, structure, and terminology to the correct answer(s). The distinction between correct and incorrect options should be subtle, testing a nuanced understanding of the topic.
+- **Avoid Absolutes:** Crucially, do not use absolute terms like 'always', 'never', or 'exclusively' in incorrect options, as these often make them easy to identify.
 
-**Constraints:**
+**FSA Level I Question Styles:**
+You MUST generate a question that fits one of the following formats, chosen based on what the context best supports. These styles are derived from official FSA exam patterns.
+
+1.  **Single-Concept (Single-Choice):** A direct question testing a key definition or concept, often within a short scenario. Always provide 4 options (A-D).
+2.  **Multiple-Answer (Choose Two/Three):** A question requiring the selection of two or three correct statements from a list.
+    - The stem must clearly state "(Choose two)" or "(Choose three)".
+    - **Crucially, these questions must always have at least six response options (A-F, etc.)** to increase complexity.
+3.  **Sequence/Ordering:** Present 4-5 numbered events, stages, or statements. The options (A-D) must be different permutations of these numbers (e.g., "3, 1, 2, 4"). The stem will ask to select the correct chronological or logical order.
+4.  **Pairing/Matching:** Ask the user to choose the option that correctly matches a data type with its relevance to a financial driver (e.g., DCF analysis) or another concept. Present 4 options (A-D), each containing a complete pair.
+5.  **Spectrum/Classification:** Ask the user to identify which item fits best at a certain point on a conceptual spectrum (e.g., farthest on the 'value' end of investing approaches). Present 4 options (A-D).
+6.  **Inclusion/Exclusion Criteria:** Ask which two statements, if true, provide evidence that a topic *fails* to meet specific criteria for inclusion in a standard. This is a "Choose two" format and must follow the rules for Multiple-Answer questions (6+ options).
+
+**Final Constraints:**
 - The question must be about "${topic}" with difficulty: ${difficulty}.
-- Adhere strictly to one of the question styles described above.
-- The explanation must follow the official style: First, explain *why* each correct option is correct. Then, for each incorrect option, explain *why* it is incorrect.
-- The output must be a single JSON object. Do not add any extra text, prose, or markdown formatting around the JSON.
+- Adhere strictly to one of the question styles and all general instructions described above.
+- The explanation must follow the official style: First, explain *why* each correct option is correct. Then, for each incorrect option, explain *why* it is incorrect, providing detailed reasoning.
+- The output must be a single, valid JSON object. Do not add any extra text, prose, or markdown formatting around the JSON.
 `;
   }
 
@@ -174,7 +181,7 @@ function validateGeneratedQuestion(
   if (!Array.isArray(out.options) || out.options.length < 2) return { ok: false, reason: "Must provide at least 2 options." };
 
   for (const key of out.answer_keys) {
-      if (!/^[A-F]$/.test(key)) return { ok: false, reason: `Invalid answer key format: ${key}`};
+      if (!/^[A-Z]$/.test(key)) return { ok: false, reason: `Invalid answer key format: ${key}`};
       const index = key.charCodeAt(0) - 65;
       if (index >= out.options.length) {
           return { ok: false, reason: `Answer key '${key}' is out of bounds for the given options.`};
